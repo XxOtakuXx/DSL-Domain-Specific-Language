@@ -9,7 +9,7 @@ Built with Flutter. No webview. No Electron. Real native performance.
 ## Who Is This For?
 
 | You are... | This helps you... |
-|---|---|
+| --- | --- |
 | **An AI power user** | Stop rewriting the same bloated prompts. Write DSL once, generate compact or verbose prompts on demand. |
 | **A developer / engineer** | Templating complex AI instructions? Define them as structured DSL, export clean JSON, pipe into any API. |
 | **A prompt engineer** | Compare token-efficient compact prompts vs. full expanded versions side-by-side. |
@@ -24,7 +24,7 @@ DSL stands for **Domain Specific Language** — a mini-language designed for one
 
 This app's DSL is dead simple. Each line is a command:
 
-```
+```text
 KEY value
 ```
 
@@ -32,7 +32,7 @@ That's it. One key, one value, per line.
 
 **Example:**
 
-```
+```text
 CREATE app
 TYPE web
 FEATURES login, dashboard, payments
@@ -56,7 +56,7 @@ When you write AI prompts manually, you tend to write things like:
 
 That's **47 tokens**. The same intent as a compact DSL prompt:
 
-```
+```text
 TASK: build app
 TYPE: web
 
@@ -75,7 +75,7 @@ That's **~23 tokens** — **51% fewer tokens**, same information. At scale acros
 
 ## Screenshots / Layout
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │  DSL Prompt Studio    [Generate] [Clear] [Compact|Expanded]  │
 │                       [Load] [Save] [Export]                 │
@@ -99,13 +99,27 @@ That's **~23 tokens** — **51% fewer tokens**, same information. At scale acros
 
 ## Installation
 
-### Prerequisites
+### Option 1 — Download a Release (No Flutter required)
 
-You need **Flutter** installed on your machine. This is a one-time setup.
+Go to the [Releases page](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language/releases/latest) and download the file for your platform:
+
+| Platform | File | How to run |
+| --- | --- | --- |
+| **Windows** | `DSL-Prompt-Studio-Windows.zip` | Extract the zip, double-click `dsl_domain_specific_language.exe` |
+| **macOS** | `DSL-Prompt-Studio-macOS.zip` | Unzip, drag the `.app` to Applications, double-click to open |
+| **Linux** | `DSL-Prompt-Studio-Linux.tar.gz` | `tar -xzf DSL-Prompt-Studio-Linux.tar.gz`, then `./dsl_domain_specific_language` |
+
+These are self-contained builds. No Flutter, no runtime, no installer wizard.
+
+> **macOS note:** On first launch, right-click the app and choose **Open** to bypass the Gatekeeper warning (app is not notarized).
 
 ---
 
-#### If You Have Never Used Flutter Before
+### Option 2 — Build from Source
+
+You need **Flutter** installed. This is a one-time setup.
+
+#### Install Flutter
 
 **Windows:**
 
@@ -115,19 +129,13 @@ You need **Flutter** installed on your machine. This is a one-time setup.
 4. Add `C:\flutter\bin` to your system PATH
    - Search "environment variables" in Start Menu
    - Under System Variables → `Path` → Edit → New → paste `C:\flutter\bin`
-5. Open a new terminal and run:
-   ```
-   flutter doctor
-   ```
-   Follow any instructions it shows (usually just installing Visual Studio Build Tools)
+5. Open a new terminal and run `flutter doctor`, then follow any instructions it shows
 
 **macOS:**
 
 ```bash
 # Install via Homebrew (recommended)
 brew install --cask flutter
-
-# Or download manually from flutter.dev
 ```
 
 **Linux:**
@@ -135,8 +143,6 @@ brew install --cask flutter
 ```bash
 # Ubuntu/Debian
 sudo snap install flutter --classic
-
-# Or download the tar.gz from flutter.dev and add to PATH
 ```
 
 After Flutter is installed, enable desktop support:
@@ -147,9 +153,7 @@ flutter config --enable-macos-desktop
 flutter config --enable-linux-desktop
 ```
 
----
-
-### Clone and Run
+#### Clone and Run
 
 ```bash
 # 1. Clone the repository
@@ -165,20 +169,16 @@ flutter run -d macos      # macOS
 flutter run -d linux      # Linux
 ```
 
-That's it. The app window opens immediately.
-
----
-
-### Build a Release Binary
+#### Build a Release Binary
 
 ```bash
-# Windows — produces a .exe + DLLs in build\windows\x64\runner\Release\
+# Windows — produces .exe + DLLs in build\windows\x64\runner\Release\
 flutter build windows
 
-# macOS — produces a .app bundle in build/macos/Build/Products/Release/
+# macOS — produces .app bundle in build/macos/Build/Products/Release/
 flutter build macos
 
-# Linux — produces a binary in build/linux/x64/release/bundle/
+# Linux — produces binary in build/linux/x64/release/bundle/
 flutter build linux
 ```
 
@@ -192,11 +192,12 @@ The release build is self-contained and can be distributed to any machine withou
 
 Click in the left editor panel and type your instructions. Each line follows the format:
 
-```
+```text
 KEY value
 ```
 
 **Rules:**
+
 - One instruction per line
 - The first word on each line is the **key** (case-insensitive)
 - Everything after the first space is the **value**
@@ -208,7 +209,7 @@ KEY value
 **All keys are flexible.** Common ones:
 
 | Key | What it means | Example |
-|---|---|---|
+| --- | --- | --- |
 | `CREATE` | What you're building | `CREATE app` |
 | `TYPE` | The type/category | `TYPE web` |
 | `FEATURES` | Comma-separated feature list | `FEATURES login, dashboard` |
@@ -257,7 +258,7 @@ The **Copy** button (top-right of the output panel) copies the current tab's con
 ### 5. Save and Load Files
 
 | Button | What it does |
-|---|---|
+| --- | --- |
 | **Load** | Open a `.dsl` or `.txt` file — loads it directly into the editor |
 | **Save** | Save your current DSL as a `.dsl` file for later |
 | **Export** | Save output as `.json` (JSON tab) or `.txt` (prompt tabs) |
@@ -270,7 +271,7 @@ This lets you build a **library of DSL templates** for different use cases.
 
 ### Build a Web App
 
-```
+```text
 CREATE app
 TYPE web
 FEATURES auth, dashboard, payments, notifications
@@ -280,7 +281,8 @@ OUTPUT full implementation
 ```
 
 **Compact prompt generated:**
-```
+
+```text
 TASK: build app
 TYPE: web
 
@@ -296,7 +298,8 @@ OUTPUT: full implementation
 ```
 
 **Expanded prompt generated:**
-```
+
+```text
 Build a modern dark web app featuring user authentication, dashboard,
 payment system, and notifications. Stack: React, Node.js, PostgreSQL.
 Provide full implementation.
@@ -306,7 +309,7 @@ Provide full implementation.
 
 ### Write a Blog Post
 
-```
+```text
 CREATE blog post
 TOPIC Flutter desktop development
 TONE professional
@@ -319,7 +322,7 @@ OUTPUT markdown
 
 ### Define an API
 
-```
+```text
 CREATE REST API
 RESOURCE users
 METHODS GET, POST, PUT, DELETE
@@ -331,7 +334,7 @@ OUTPUT OpenAPI spec
 
 ### System Architecture
 
-```
+```text
 CREATE microservice
 NAME auth-service
 RESPONSIBILITIES login, token refresh, logout
@@ -347,7 +350,7 @@ OUTPUT architecture diagram + code
 The compact mode automatically compresses common terms:
 
 | Input | Compressed to |
-|---|---|
+| --- | --- |
 | `login` | `auth` |
 | `authentication` | `auth` |
 | `user authentication` | `auth` |
@@ -370,7 +373,7 @@ Terms not in this list are passed through unchanged.
 
 ## Project Structure (For Developers)
 
-```
+```text
 lib/
 ├── main.dart                    Entry point — window config, ProviderScope, theme
 ├── theme/
@@ -394,7 +397,7 @@ lib/
 This app uses [Riverpod](https://riverpod.dev/) with simple `StateProvider`s:
 
 | Provider | Type | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `dslInputProvider` | `StateProvider<String>` | Raw text in the editor |
 | `generatedOutputProvider` | `StateProvider<GeneratedOutput?>` | Last generated result |
 | `selectedTabProvider` | `StateProvider<int>` | Active output tab (0/1/2) |
@@ -435,6 +438,7 @@ flutter test
 ```
 
 Tests cover the parser and prompt builder:
+
 - Key-value extraction
 - Comma array splitting
 - Key normalization
@@ -448,7 +452,7 @@ Tests cover the parser and prompt builder:
 ## Tech Stack
 
 | Component | Technology |
-|---|---|
+| --- | --- |
 | UI Framework | Flutter 3.x (native desktop) |
 | Language | Dart 3.x |
 | State Management | Riverpod 2.x |
@@ -461,22 +465,26 @@ Tests cover the parser and prompt builder:
 ## Platform Notes
 
 ### Windows
+
 - Minimum: Windows 10 (x64)
 - Builds to a standalone folder with `.exe` + required DLLs
 - Visual Studio 2022 Build Tools required to build from source
 
 ### macOS
+
 - Minimum: macOS 10.14 Mojave
-- Builds to a `.app` bundle
+- Builds to a `.app` bundle (arm64, runs on Intel via Rosetta 2)
 - Xcode required to build from source
 - Sandbox entitlements configured for file access
 
 ### Linux
+
 - Tested on Ubuntu 22.04+
 - Requires `gtk3` and `clang` to build from source:
-  ```bash
-  sudo apt-get install clang cmake ninja-build pkg-config libgtk-3-dev
-  ```
+
+```bash
+sudo apt-get install clang cmake ninja-build pkg-config libgtk-3-dev
+```
 
 ---
 
