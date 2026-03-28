@@ -135,7 +135,7 @@ jobs:
             | Platform | File | Instructions |
             |---|---|---|
             | **Windows** | `DSL-Prompt-Studio-Windows.zip` | Extract the zip, run `dsl_domain_specific_language.exe` |
-            | **macOS** | `DSL-Prompt-Studio-macOS.zip` | Unzip, drag `DSL Prompt Studio.app` to Applications |
+            | **macOS** | `DSL-Prompt-Studio-macOS.zip` | Unzip, drag `dsl_domain_specific_language.app` to Applications |
             | **Linux** | `DSL-Prompt-Studio-Linux.tar.gz` | Extract: `tar -xzf *.tar.gz`, run `./dsl_domain_specific_language` |
 
             ### Requirements

@@ -67,6 +67,21 @@ void main() {
       expect(expanded, contains('.'));
     });
 
+    test('compact emits list-valued extra keys (e.g. STACK)', () {
+      final data = {
+        'create': 'app',
+        'stack': ['React', 'Node.js', 'PostgreSQL'],
+      };
+      final compact = builder.buildCompact(data);
+      expect(compact, contains('STACK: React, Node.js, PostgreSQL'));
+    });
+
+    test('compact emits STYLE when value contains a comma', () {
+      final data = {'style': ['modern', 'dark']};
+      final compact = builder.buildCompact(data);
+      expect(compact, contains('STYLE: modern, dark'));
+    });
+
     test('returns empty string for empty input', () {
       expect(builder.buildCompact({}), '');
       expect(builder.buildExpanded({}), '');

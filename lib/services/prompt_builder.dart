@@ -63,12 +63,18 @@ class PromptBuilder {
 
     // TASK line
     if (data.containsKey('create')) {
-      buf.writeln('TASK: build ${_applyCompression(_str(data['create']))}');
+      final cv = data['create'];
+      final createStr = cv is List ? (cv as List<String>).join(', ') : _str(cv);
+      if (createStr.isNotEmpty) {
+        buf.writeln('TASK: build ${_applyCompression(createStr)}');
+      }
     }
 
     // TYPE line
     if (data.containsKey('type')) {
-      buf.writeln('TYPE: ${_str(data['type'])}');
+      final tv = data['type'];
+      final typeStr = tv is List ? (tv as List<String>).join(', ') : _str(tv);
+      if (typeStr.isNotEmpty) buf.writeln('TYPE: $typeStr');
     }
 
     // Any extra non-feature keys before FEATURES
