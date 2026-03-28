@@ -181,11 +181,26 @@ class _OutputPanelState extends ConsumerState<OutputPanel>
 
 // ── Code view ─────────────────────────────────────────────────────────────────
 
-class _CodeView extends StatelessWidget {
+class _CodeView extends StatefulWidget {
   const _CodeView({required this.content, required this.language});
 
   final String content;
   final String language;
+
+  @override
+  State<_CodeView> createState() => _CodeViewState();
+}
+
+class _CodeViewState extends State<_CodeView> {
+  // canRequestFocus: false prevents SelectableText from stealing keyboard
+  // focus from the editor when output is first rendered.
+  final FocusNode _focusNode = FocusNode(canRequestFocus: false);
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +212,7 @@ class _CodeView extends StatelessWidget {
           color: AppColors.surface,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           alignment: Alignment.centerLeft,
-          child: Text(language.toUpperCase(), style: AppTextStyles.labelSmall),
+          child: Text(widget.language.toUpperCase(), style: AppTextStyles.labelSmall),
         ),
         Expanded(
           child: Scrollbar(
@@ -205,8 +220,9 @@ class _CodeView extends StatelessWidget {
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: SelectableText(
-                content,
+                widget.content,
                 style: AppTextStyles.outputText,
+                focusNode: _focusNode,
               ),
             ),
           ),
