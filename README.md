@@ -8,6 +8,10 @@ Built with Flutter. No webview. No Electron. Real native performance.
 
 ## Changelog
 
+### v1.0.2
+
+- Fixed: keys with comma-separated values (e.g. `STACK React, Node.js`) were silently dropped from compact output
+
 ### v1.0.1
 
 - Fixed: typing in the editor and pressing Ctrl+Enter stopped working after the first Generate
