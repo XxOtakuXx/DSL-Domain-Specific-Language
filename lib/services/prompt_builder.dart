@@ -76,6 +76,9 @@ class PromptBuilder {
       final v = data[k];
       if (v is String) {
         buf.writeln('${k.toUpperCase()}: ${_applyCompression(v)}');
+      } else if (v is List) {
+        final items = (v as List<String>).map(_applyCompression).join(', ');
+        buf.writeln('${k.toUpperCase()}: $items');
       }
     }
 
@@ -90,13 +93,19 @@ class PromptBuilder {
 
     // STYLE line
     if (data.containsKey('style')) {
-      buf.writeln();
-      buf.writeln('STYLE: ${_str(data['style'])}');
+      final sv = data['style'];
+      final styleStr = sv is List ? (sv as List<String>).join(', ') : _str(sv);
+      if (styleStr.isNotEmpty) {
+        buf.writeln();
+        buf.writeln('STYLE: $styleStr');
+      }
     }
 
     // OUTPUT line
     if (data.containsKey('output')) {
-      buf.writeln('OUTPUT: ${_str(data['output'])}');
+      final ov = data['output'];
+      final outStr = ov is List ? (ov as List<String>).join(', ') : _str(ov);
+      if (outStr.isNotEmpty) buf.writeln('OUTPUT: $outStr');
     }
 
     return buf.toString().trimRight();
