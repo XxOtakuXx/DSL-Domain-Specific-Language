@@ -67,7 +67,7 @@ jobs:
       - name: Zip macOS app bundle
         run: |
           cd build/macos/Build/Products/Release
-          zip -r "$GITHUB_WORKSPACE/DSL-Prompt-Studio-macOS.zip" "DSL Prompt Studio.app"
+          zip -r "$GITHUB_WORKSPACE/DSL-Prompt-Studio-macOS.zip" *.app
           echo "Created DSL-Prompt-Studio-macOS.zip"
 
       - uses: actions/upload-artifact@v4
