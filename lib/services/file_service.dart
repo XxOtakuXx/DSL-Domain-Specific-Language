@@ -32,8 +32,12 @@ class FileService {
       allowedExtensions: ['dsl'],
     );
     if (path == null) return false;
-    await File(path).writeAsString(content);
-    return true;
+    try {
+      await File(path).writeAsString(content);
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   // ── Export JSON ───────────────────────────────────────────────────────────
@@ -46,8 +50,12 @@ class FileService {
       allowedExtensions: ['json'],
     );
     if (path == null) return false;
-    await File(path).writeAsString(jsonContent);
-    return true;
+    try {
+      await File(path).writeAsString(jsonContent);
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   // ── Export Prompt ─────────────────────────────────────────────────────────
@@ -60,7 +68,11 @@ class FileService {
       allowedExtensions: ['txt'],
     );
     if (path == null) return false;
-    await File(path).writeAsString(promptContent);
-    return true;
+    try {
+      await File(path).writeAsString(promptContent);
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 }
