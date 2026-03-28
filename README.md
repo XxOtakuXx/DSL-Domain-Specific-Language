@@ -6,6 +6,18 @@ Built with Flutter. No webview. No Electron. Real native performance.
 
 ---
 
+## Changelog
+
+### v1.0.1
+
+- Fixed: typing in the editor and pressing Ctrl+Enter stopped working after the first Generate
+
+### v1.0.0
+
+- Initial release — Windows, macOS, Linux native desktop builds
+
+---
+
 ## Who Is This For?
 
 | You are... | This helps you... |
