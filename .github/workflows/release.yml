@@ -1,0 +1,146 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  # ── Windows ──────────────────────────────────────────────────────────────────
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows
+        run: flutter build windows --release
+
+      - name: Zip Windows build
+        shell: pwsh
+        run: |
+          $src = "build\windows\x64\runner\Release"
+          $dst = "DSL-Prompt-Studio-Windows.zip"
+          Compress-Archive -Path "$src\*" -DestinationPath $dst
+          Write-Host "Created $dst"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: DSL-Prompt-Studio-Windows.zip
+
+  # ── macOS ────────────────────────────────────────────────────────────────────
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build macOS
+        run: flutter build macos --release
+
+      - name: Zip macOS app bundle
+        run: |
+          cd build/macos/Build/Products/Release
+          zip -r "$GITHUB_WORKSPACE/DSL-Prompt-Studio-macOS.zip" "DSL Prompt Studio.app"
+          echo "Created DSL-Prompt-Studio-macOS.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-installer
+          path: DSL-Prompt-Studio-macOS.zip
+
+  # ── Linux ────────────────────────────────────────────────────────────────────
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Linux
+        run: flutter build linux --release
+
+      - name: Tar Linux bundle
+        run: |
+          cd build/linux/x64/release/bundle
+          tar -czf "$GITHUB_WORKSPACE/DSL-Prompt-Studio-Linux.tar.gz" .
+          echo "Created DSL-Prompt-Studio-Linux.tar.gz"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-installer
+          path: DSL-Prompt-Studio-Linux.tar.gz
+
+  # ── GitHub Release ───────────────────────────────────────────────────────────
+  release:
+    needs: [build-windows, build-macos, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -lh artifacts/
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: DSL Prompt Studio ${{ github.ref_name }}
+          body: |
+            ## DSL Prompt Studio ${{ github.ref_name }}
+
+            Native desktop app for Windows, macOS, and Linux — write structured DSL and instantly generate token-optimized AI prompts.
+
+            ### Downloads
+
+            | Platform | File | Instructions |
+            |---|---|---|
+            | **Windows** | `DSL-Prompt-Studio-Windows.zip` | Extract the zip, run `dsl_domain_specific_language.exe` |
+            | **macOS** | `DSL-Prompt-Studio-macOS.zip` | Unzip, drag `DSL Prompt Studio.app` to Applications |
+            | **Linux** | `DSL-Prompt-Studio-Linux.tar.gz` | Extract: `tar -xzf *.tar.gz`, run `./dsl_domain_specific_language` |
+
+            ### Requirements
+            No Flutter installation needed — these are self-contained release builds.
+
+            - Windows 10+ (x64)
+            - macOS 10.14+ (Mojave)
+            - Linux (Ubuntu 22.04+ recommended; requires gtk3)
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/DSL-Prompt-Studio-Windows.zip
+            artifacts/DSL-Prompt-Studio-macOS.zip
+            artifacts/DSL-Prompt-Studio-Linux.tar.gz
