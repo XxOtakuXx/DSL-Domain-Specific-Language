@@ -58,6 +58,9 @@ jobs:
       - name: Precache macOS artifacts
         run: flutter precache --macos
 
+      - name: Install CocoaPods dependencies
+        run: cd macos && pod install
+
       - name: Build macOS
         run: flutter build macos --release
 
