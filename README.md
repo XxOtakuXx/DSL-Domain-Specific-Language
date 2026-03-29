@@ -222,18 +222,18 @@ KEY value
 - Blank lines are ignored
 - Invalid lines are silently skipped — nothing will crash
 
-**All keys are flexible.** Common ones:
+**All keys are flexible.** There are 5 special keys with fixed positions in the output, plus any extra key you invent:
 
-| Key | What it means | Example |
-| --- | --- | --- |
-| `CREATE` | What you're building | `CREATE app` |
-| `TYPE` | The type/category | `TYPE web` |
-| `FEATURES` | Comma-separated feature list | `FEATURES login, dashboard` |
-| `STYLE` | Visual or design style | `STYLE modern dark` |
-| `OUTPUT` | What you want back | `OUTPUT full code` |
-| `STACK` | Tech stack | `STACK React, Node, PostgreSQL` |
-| `AUDIENCE` | Target users | `AUDIENCE developers` |
-| `TONE` | Writing tone | `TONE professional` |
+| Key | Special? | Role | Example |
+| --- | --- | --- | --- |
+| `CREATE` | Yes | Becomes `TASK: build …` in compact; subject of the opening sentence in expanded | `CREATE app` |
+| `TYPE` | Yes | `TYPE: …` line right after TASK | `TYPE web` |
+| `FEATURES` | Yes | Renders as a bullet list in compact; `Include X, Y, and Z.` in expanded | `FEATURES login, dashboard` |
+| `STYLE` | Yes | `STYLE: …` after the features block; prepended to opening sentence in expanded | `STYLE modern dark` |
+| `OUTPUT` | Yes | Always last line; `Provide …` in expanded | `OUTPUT full code` |
+| Any other key | No | Appears between TYPE and FEATURES in compact order; as `Key: value.` sentence in expanded | `STACK React, Node` |
+
+See the **Key Reference Cheat Sheet** below for a full catalog of useful keys by category.
 
 You can use **any key you want** — the parser handles everything generically.
 
@@ -283,24 +283,159 @@ This lets you build a **library of DSL templates** for different use cases.
 
 ---
 
-## DSL Examples
+## Key Reference Cheat Sheet
 
-### Build a Web App
+### How the Output Is Built
+
+The compact and expanded builders treat keys differently depending on whether they are "special" or "extra":
+
+**Compact output order:** `TASK` → `TYPE` → extra keys (input order) → `FEATURES` list → `STYLE` → `OUTPUT`
+
+**Expanded output order:** opening sentence (`STYLE` + `TYPE` + `CREATE`) → features sentence → extra key sentences → `OUTPUT` sentence
+
+---
+
+### Special Keys
+
+These 5 keys have fixed positions and dedicated formatting:
+
+| Key | Compact output | Expanded output |
+| --- | --- | --- |
+| `CREATE` | `TASK: build <value>` — always first | Subject of the opening sentence |
+| `TYPE` | `TYPE: <value>` — second line | Appended to the opening sentence |
+| `FEATURES` | `FEATURES:` bullet list — after extra keys | `Include X, Y, and Z.` sentence |
+| `STYLE` | `STYLE: <value>` — after features | Adjective in the opening sentence |
+| `OUTPUT` | `OUTPUT: <value>` — always last | `Provide <value>.` last sentence |
+
+Comma-separated values in FEATURES become individual bullets. Any other special key with a comma becomes a joined string (e.g. `STYLE modern, minimal` → `STYLE: modern, minimal`).
+
+---
+
+### Extra Keys by Category
+
+Any key not in the special 5 is an **extra key**. It appears as `KEY: value` between TYPE and FEATURES in compact, and as `Key: value.` in expanded. Use any name you want.
+
+#### Software Development
+
+| Key | Purpose | Example value |
+| --- | --- | --- |
+| `STACK` | Full tech stack | `React, Node.js, PostgreSQL` |
+| `FRAMEWORK` | Specific framework | `Next.js` / `Django` / `Spring Boot` |
+| `LANGUAGE` | Programming language | `TypeScript` / `Python` / `Rust` |
+| `DATABASE` | Data store | `PostgreSQL, Redis` |
+| `AUTH` | Authentication method | `JWT` / `OAuth2` / `session cookies` |
+| `PLATFORM` | Target platform | `AWS` / `Vercel` / `self-hosted` |
+| `ARCHITECTURE` | System design pattern | `microservices` / `monolith` / `serverless` |
+| `PROTOCOL` | Communication protocol | `REST` / `gRPC` / `WebSocket` |
+| `TESTING` | Test strategy | `unit, integration, e2e` |
+| `CONSTRAINTS` | Hard limits | `no external libraries` / `must run offline` |
+
+#### API Design
+
+| Key | Purpose | Example value |
+| --- | --- | --- |
+| `RESOURCE` | Primary API resource | `users` / `orders` / `products` |
+| `METHODS` | HTTP verbs | `GET, POST, PUT, DELETE` |
+| `VERSION` | API version | `v1` |
+| `FORMAT` | Request/response format | `JSON` / `XML` |
+| `PAGINATION` | Pagination style | `cursor-based` / `offset` |
+| `RATE_LIMIT` | Rate limiting | `100 req/min per user` |
+
+#### Content & Writing
+
+| Key | Purpose | Example value |
+| --- | --- | --- |
+| `TOPIC` | Subject matter | `Flutter desktop development` |
+| `TONE` | Voice / register | `professional` / `casual` / `technical` / `persuasive` |
+| `AUDIENCE` | Target readers | `developers` / `executives` / `beginners` |
+| `LENGTH` | Target length | `1000 words` / `short` / `detailed` |
+| `PERSPECTIVE` | Point of view | `first person` / `third person` |
+| `SECTIONS` | Required sections | `intro, body, conclusion, CTA` |
+| `KEYWORDS` | SEO or focus terms | `Flutter, Dart, desktop` |
+| `EXAMPLES` | Whether to include examples | `3 code examples` / `real-world cases` |
+
+#### AI / Prompt Engineering
+
+| Key | Purpose | Example value |
+| --- | --- | --- |
+| `ROLE` | Persona the AI should adopt | `senior engineer` / `technical writer` / `tutor` |
+| `TASK` | Core instruction | `summarize` / `explain` / `generate` / `analyze` |
+| `CONTEXT` | Background the AI needs | `legacy codebase, no tests` |
+| `RULES` | Hard constraints | `no jargon` / `always cite sources` |
+| `PERSONA` | Character or voice | `friendly and concise` |
+| `AVOID` | What to exclude | `markdown` / `bullet points` / `assumptions` |
+
+#### DevOps & Infrastructure
+
+| Key | Purpose | Example value |
+| --- | --- | --- |
+| `TRIGGER` | CI event | `push to main` / `pull request` / `schedule` |
+| `STEPS` | Pipeline stages | `lint, test, build, deploy` |
+| `ENVIRONMENT` | Target env | `staging` / `production` |
+| `RUNNER` | CI runner | `ubuntu-latest` / `macos-14` |
+| `SECRETS` | Required secrets | `API_KEY, DATABASE_URL` |
+| `ROLLBACK` | Rollback strategy | `automatic on failure` |
+
+#### Data & ML
+
+| Key | Purpose | Example value |
+| --- | --- | --- |
+| `MODEL` | ML model type | `classification` / `regression` / `LLM fine-tune` |
+| `DATA` | Dataset description | `CSV, 50k rows, labeled` |
+| `METRICS` | Evaluation metrics | `accuracy, F1, AUC` |
+| `TRAINING` | Training approach | `transfer learning` / `from scratch` |
+| `INFERENCE` | Inference target | `real-time API` / `batch` |
+
+---
+
+### Keyword Auto-Compression
+
+In **Compact mode**, these input values are automatically shortened to save tokens:
+
+| You write | Compact outputs |
+| --- | --- |
+| `login` / `authentication` / `user auth` | `auth` |
+| `sign in` / `signin` | `auth` |
+| `signup` / `sign up` | `registration` |
+| `admin panel` / `administration` | `admin` |
+| `database` | `db` |
+| `notification` / `notifications` | `notif` / `notifs` |
+| `user interface` | `ui` |
+| `application` | `app` |
+| `repository` | `repo` |
+| `configuration` | `config` |
+| `environment` | `env` |
+| `deployment` | `deploy` |
+| `documentation` | `docs` |
+| `performance` | `perf` |
+| `optimization` / `optimized` | `opt` |
+| `responsive design` | `responsive` |
+
+Anything not in this list passes through unchanged. To add your own, edit `_compress` in [lib/services/prompt_builder.dart](lib/services/prompt_builder.dart).
+
+---
+
+## Examples by Use Case
+
+### Web Application
 
 ```text
 CREATE app
 TYPE web
-FEATURES auth, dashboard, payments, notifications
-STYLE modern dark
 STACK React, Node.js, PostgreSQL
-OUTPUT full implementation
+AUTH JWT
+FEATURES login, dashboard, payments, notifications
+STYLE modern dark
+OUTPUT full implementation with file structure
 ```
 
-**Compact prompt generated:**
+**Compact:**
 
 ```text
 TASK: build app
 TYPE: web
+STACK: React, Node.js, PostgreSQL
+AUTH: JWT
 
 FEATURES:
 - auth
@@ -309,81 +444,198 @@ FEATURES:
 - notifs
 
 STYLE: modern dark
-STACK: React, Node.js, PostgreSQL
-OUTPUT: full implementation
+OUTPUT: full implementation with file structure
 ```
 
-**Expanded prompt generated:**
+**Expanded:**
 
 ```text
-Build a modern dark web app featuring user authentication, dashboard,
+Build a modern dark web app. Include user authentication, dashboard,
 payment system, and notifications. Stack: React, Node.js, PostgreSQL.
-Provide full implementation.
+Auth: JWT. Provide full implementation with file structure.
 ```
 
 ---
 
-### Write a Blog Post
+### Mobile App
 
 ```text
-CREATE blog post
-TOPIC Flutter desktop development
-TONE professional
-AUDIENCE developers
-LENGTH 1000 words
-OUTPUT markdown
+CREATE app
+TYPE mobile
+PLATFORM iOS, Android
+FRAMEWORK Flutter
+FEATURES onboarding, home feed, profile, push notifications
+STYLE clean minimal
+OUTPUT full Flutter project
 ```
 
 ---
 
-### Define an API
+### REST API
 
 ```text
 CREATE REST API
 RESOURCE users
 METHODS GET, POST, PUT, DELETE
 AUTH JWT
-OUTPUT OpenAPI spec
+VERSION v1
+FORMAT JSON
+PAGINATION cursor-based
+OUTPUT OpenAPI 3.0 spec + Express.js implementation
 ```
 
 ---
 
-### System Architecture
+### GraphQL API
+
+```text
+CREATE GraphQL API
+RESOURCE products, orders, users
+AUTH OAuth2
+DATABASE MongoDB
+FEATURES mutations, subscriptions, pagination
+OUTPUT schema + resolvers
+```
+
+---
+
+### Blog Post / Article
+
+```text
+CREATE blog post
+TOPIC how to build a native desktop app with Flutter
+TONE conversational but technical
+AUDIENCE intermediate developers
+LENGTH 1500 words
+SECTIONS intro, setup, building the UI, state management, packaging, conclusion
+KEYWORDS Flutter, desktop, Dart, native
+OUTPUT markdown with code examples
+```
+
+**Compact:**
+
+```text
+TASK: build blog post
+TOPIC: how to build a native desktop app with Flutter
+TONE: conversational but technical
+AUDIENCE: intermediate developers
+LENGTH: 1500 words
+SECTIONS: intro, setup, building the UI, state management, packaging, conclusion
+KEYWORDS: Flutter, desktop, Dart, native
+OUTPUT: markdown with code examples
+```
+
+**Expanded:**
+
+```text
+Build a blog post. Topic: how to build a native desktop app with Flutter.
+Tone: conversational but technical. Audience: intermediate developers.
+Length: 1500 words. Sections: intro, setup, building the UI, state management,
+packaging, conclusion. Keywords: Flutter, desktop, Dart, native.
+Provide markdown with code examples.
+```
+
+---
+
+### Marketing Email
+
+```text
+CREATE email
+TYPE promotional
+TONE friendly, persuasive
+AUDIENCE existing customers
+GOAL re-engage lapsed users
+PRODUCT DSL Prompt Studio v1.0
+OFFER 30-day free trial of Pro tier
+SECTIONS subject line, opening hook, value prop, CTA, footer
+OUTPUT plain text + HTML version
+```
+
+---
+
+### Code Review Prompt
+
+```text
+CREATE code review
+LANGUAGE TypeScript
+FOCUS security, performance, readability
+PATTERNS SOLID, DRY, no magic numbers
+AVOID nitpicks on formatting
+CONTEXT new contributor, first PR
+OUTPUT inline comments + summary
+```
+
+---
+
+### CI/CD Pipeline
+
+```text
+CREATE GitHub Actions workflow
+TRIGGER push to main, pull request
+STEPS lint, unit tests, build, docker push, deploy
+ENVIRONMENT staging on PR, production on main
+PLATFORM AWS ECS
+SECRETS DATABASE_URL, AWS_ACCESS_KEY_ID
+ROLLBACK automatic on health check failure
+OUTPUT complete YAML workflow file
+```
+
+---
+
+### Database Schema
+
+```text
+CREATE database schema
+DATABASE PostgreSQL
+TABLES users, sessions, posts, comments, tags
+RELATIONS user has_many posts, post has_many comments, post has_many tags
+INDEXES users.email, posts.created_at, posts.user_id
+CONSTRAINTS email unique, soft deletes on posts
+OUTPUT SQL migration files
+```
+
+---
+
+### AI System Prompt
+
+```text
+CREATE system prompt
+ROLE senior software architect
+TASK review architecture decisions and suggest improvements
+CONTEXT distributed system, 10M daily active users, latency-sensitive
+RULES always explain trade-offs, cite CAP theorem where relevant, no vague advice
+AVOID recommending rewrites without justification
+OUTPUT structured review with priority levels
+```
+
+---
+
+### Data Science / ML
+
+```text
+CREATE ML pipeline
+TASK binary classification
+DATA customer churn CSV, 200k rows, imbalanced 90/10
+MODEL XGBoost with SMOTE oversampling
+METRICS accuracy, F1, AUC-ROC
+TRAINING 5-fold cross-validation
+FEATURES age, tenure, usage, support_tickets
+OUTPUT Python notebook with EDA, training, and evaluation
+```
+
+---
+
+### Microservice
 
 ```text
 CREATE microservice
-NAME auth-service
-RESPONSIBILITIES login, token refresh, logout
-DATABASE Redis, PostgreSQL
-PROTOCOL gRPC
-OUTPUT architecture diagram + code
+NAME payment-service
+RESPONSIBILITIES charge, refund, webhook handling, idempotency
+PROTOCOL gRPC internal, REST external
+DATABASE PostgreSQL for ledger, Redis for idempotency keys
+AUTH service-to-service mTLS
+OUTPUT Go service with proto definitions and Docker setup
 ```
-
----
-
-## Keyword Compression Reference
-
-The compact mode automatically compresses common terms:
-
-| Input | Compressed to |
-| --- | --- |
-| `login` | `auth` |
-| `authentication` | `auth` |
-| `user authentication` | `auth` |
-| `admin panel` | `admin` |
-| `administration` | `admin` |
-| `database` | `db` |
-| `notifications` | `notifs` |
-| `user interface` | `ui` |
-| `application` | `app` |
-| `configuration` | `config` |
-| `deployment` | `deploy` |
-| `documentation` | `docs` |
-| `performance` | `perf` |
-| `optimization` | `opt` |
-| `responsive design` | `responsive` |
-
-Terms not in this list are passed through unchanged.
 
 ---
 
