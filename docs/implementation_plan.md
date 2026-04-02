@@ -1,223 +1,170 @@
-# Natural Language "Plain Talk" Mode — Multi-Provider AI
+# Template Library — Premade Prompt Recommendations
 
-## Overview
-
-Add a **Plain Talk** input mode alongside the existing DSL editor. Users type a plain English sentence; the app uses whichever AI provider the user has configured, or falls back to a built-in offline rule-based parser if none is set up.
+A new **Templates** screen that gives users instant access to 80+ professionally crafted DSL prompts across every major use case. Users can browse by category, search by keyword, preview the DSL content, and load any template directly into the editor with one click.
 
 ---
 
-## New Dependencies → `pubspec.yaml`
+## User Review Required
 
-| Package | Reason |
-|---|---|
-| `http: ^1.2.0` | All API HTTP calls |
-| `shared_preferences: ^2.3.0` | Persist provider choice + API keys between sessions |
+> [!IMPORTANT]
+> This adds a new top-level navigation tab ("Templates") alongside the existing "Editor" and "Settings" tabs in the title bar. All three tabs will be accessible at all times.
 
----
-
-## Supported AI Providers
-
-| Provider | Model | Key Required | Notes |
-|---|---|---|---|
-| **Gemini** | `gemini-2.0-flash` | Yes (free tier available) | Google AI Studio |
-| **OpenAI** | `gpt-4o-mini` | Yes (paid) | OpenAI platform |
-| **Anthropic** | `claude-haiku-3-5` | Yes (paid) | Anthropic console |
-| **Ollama** | user-selected model | No (runs locally) | 100% offline/free |
-| **None** | — | — | Falls back to built-in rule-based parser |
-
----
-
-## Architecture — AI Provider Abstraction
-
-#### [NEW] `lib/services/ai_providers/ai_provider.dart`
-Abstract interface every provider implements:
-```dart
-abstract class AiProvider {
-  String get name;
-  String get id;
-  Future<Map<String, dynamic>> parse(String input);
-}
-```
-
-#### [NEW] `lib/services/ai_providers/gemini_provider.dart`
-Calls `generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`
-
-#### [NEW] `lib/services/ai_providers/openai_provider.dart`
-Calls `api.openai.com/v1/chat/completions` with model `gpt-4o-mini`
-
-#### [NEW] `lib/services/ai_providers/anthropic_provider.dart`
-Calls `api.anthropic.com/v1/messages` with model `claude-haiku-3-5`
-
-#### [NEW] `lib/services/ai_providers/ollama_provider.dart`
-Calls `http://localhost:11434/api/chat` — no key needed, user picks model name (e.g. `llama3`, `mistral`)
-
-All providers use the same system prompt to extract structured JSON, and return `Map<String, dynamic>` identical to `DslParser` output.
-
-**System prompt (shared across all providers):**
-```
-You are a structured data extractor. Given a plain English description of a software project, extract and return ONLY a valid JSON object with these keys:
-- "create": short noun phrase of what to build
-- "type": one of [web, mobile, api, desktop, cli, other]
-- "features": array of key features
-- "style": visual/technical style if mentioned (or omit)
-No explanation. No markdown. JSON only.
-```
+> [!NOTE]
+> All templates are stored as pure Dart data (no network, no files). The library loads instantly with zero I/O.
 
 ---
 
 ## Proposed Changes
 
-### Component 1 — Providers
+### 1. Data Layer — Template Library
+
+#### [NEW] `lib/data/template_library.dart`
+A single file containing all template data. Each template has:
+- `id` — unique string
+- `title` — display name
+- `description` — one-line summary
+- `category` — one of 10+ categories
+- `tags` — list of keywords for search
+- `dsl` — the ready-to-use DSL content
+
+**Categories & template count:**
+
+| Category | Icon | Templates |
+|---|---|---|
+| 🖥️ Software Dev | `code` | 14 templates |
+| 📱 Mobile | `phone_android` | 4 templates |
+| 🌐 API Design | `api` | 5 templates |
+| ✍️ Content & Writing | `edit_note` | 10 templates |
+| 🤖 AI & Prompts | `auto_awesome` | 8 templates |
+| 🚀 DevOps | `rocket_launch` | 7 templates |
+| 📊 Data & ML | `bar_chart` | 7 templates |
+| 💼 Business | `business_center` | 8 templates |
+| 🎓 Education | `school` | 5 templates |
+| 🎨 Creative | `palette` | 5 templates |
+| ⚖️ Legal & HR | `gavel` | 6 templates |
+| 🔬 Research | `science` | 4 templates |
+
+**Sample templates in each category:**
+
+*Software Dev:* Full-stack Web App, REST API, GraphQL API, Microservice, Database Schema, Auth System, Real-time Chat, Admin Dashboard, Browser Extension, CLI Tool, Desktop App, Data Dashboard, E-commerce Platform, SaaS Boilerplate
+
+*Mobile:* Flutter App, React Native App, iOS App, Android App
+
+*API Design:* REST CRUD API, GraphQL API, WebSocket Server, gRPC Service, OpenAPI Spec
+
+*Content & Writing:* Blog Post, Technical Article, Newsletter, LinkedIn Post, Twitter/X Thread, YouTube Script, Product Description, Landing Page Copy, Press Release, White Paper
+
+*AI & Prompts:* System Prompt, Code Review Bot, Research Assistant, Data Analyst, Tutor, Customer Support Bot, Sales Coach, Creative Writing Partner
+
+*DevOps:* GitHub Actions CI/CD, Docker Setup, Kubernetes Manifests, Terraform IaC, Monitoring & Alerting, Security Audit, Database Migration
+
+*Data & ML:* ML Pipeline, EDA Notebook, NLP Model, Computer Vision, Recommendation System, A/B Test Analysis, Data Cleaning Script
+
+*Business:* Business Plan, Pitch Deck, Competitive Analysis, Go-to-Market Strategy, OKR Framework, Product Roadmap, SWOT Analysis, Project Brief
+
+*Education:* Course Outline, Study Guide, Lesson Plan, Quiz Generator, Explainer Article
+
+*Creative:* Short Story, World Building, Character Creation, Screenplay, Game Design Document
+
+*Legal & HR:* Privacy Policy, Terms of Service, Job Description, Performance Review, Interview Questions, Meeting Agenda
+
+*Research:* Literature Review, Research Proposal, Survey Design, Statistical Analysis
+
+---
+
+### 2. Provider — Nav Page Extension
 
 #### [MODIFY] `lib/providers/dsl_providers.dart`
-- Add `enum InputMode { dsl, plainTalk }`
-- Add `inputModeProvider`
-- Add `plainInputProvider`
-- Add `enum AiProviderId { none, gemini, openai, anthropic, ollama }`
-- Add `selectedProviderIdProvider = StateProvider<AiProviderId>((ref) => AiProviderId.none)`
-- Add `apiKeyProvider = StateProvider<String>((ref) => '')` (key for the selected provider)
-- Add `ollamaModelProvider = StateProvider<String>((ref) => 'llama3')` (Ollama model name)
-- Add `isAiLoadingProvider = StateProvider<bool>((ref) => false)`
-
----
-
-### Component 2 — Settings Service
-
-#### [NEW] `lib/services/settings_service.dart`
-Persists to `SharedPreferences`:
-- `loadSettings()` → `SettingsData { providerId, apiKey, ollamaModel }`
-- `saveSettings(SettingsData)`
-- `clearApiKey()`
-
----
-
-### Component 3 — Rule-Based Fallback Parser
-
-#### [NEW] `lib/services/plain_talk_parser.dart`
-Pure-Dart, zero-dependency, instant:
-- **Intent** → `create`: build/create/make/design/develop/write
-- **Type**: website/site → `web`; mobile/iOS/Android → `mobile`; API/backend/server → `api`; CLI/script/tool → `cli`; dashboard → `web`
-- **Feature keyword map**: selling/shop/store → `e-commerce`; login/auth → `auth`; admin → `admin panel`; payment/checkout → `payments`; search → `search`; chat/message → `messaging`; notification → `notifications`; map/location → `maps`; analytics → `analytics`
-- **Style**: modern/minimal/dark/responsive/clean captured verbatim
-
----
-
-### Component 4 — AI Parser Dispatcher
-
-#### [NEW] `lib/services/ai_parser.dart`
-Routes to the correct provider based on `AiProviderId`:
+Add `templates` to the `NavPage` enum:
 ```dart
-class AiParser {
-  static Future<Map<String, dynamic>> parse({
-    required String input,
-    required AiProviderId providerId,
-    required String apiKey,
-    required String ollamaModel,
-  }) async { ... }
-}
+// Before:
+enum NavPage { editor, settings }
+
+// After:
+enum NavPage { editor, templates, settings }
 ```
-On error or timeout → returns `null`, caller falls back to `PlainTalkParser`
+
+Also add a search query provider for the templates screen:
+```dart
+final templateSearchProvider = StateProvider<String>((ref) => '');
+final templateCategoryProvider = StateProvider<String?>((ref) => null);
+```
 
 ---
 
-### Component 5 — Plain Talk Editor Widget
+### 3. Templates Screen
 
-#### [NEW] `lib/widgets/plain_talk_editor.dart`
-- Large, friendly `TextField` (sans-serif, relaxed padding)
-- Hint: `"Describe what you want to build in plain English..."`
-- **Live detection strip** at the bottom (rule-based preview, instant):
-  `type: web  •  features: 3 detected  •  style: modern`
-- Header badge: `✦ AI: Gemini` / `✦ AI: Ollama` / `⊘ Offline` based on configured provider
+#### [NEW] `lib/screens/templates_screen.dart`
+A full-screen layout with:
 
----
+**Left panel (220px)** — Category sidebar
+- "All Templates" option at top (shows count)
+- List of category items, each with icon, name, and template count badge
+- Active category highlighted with accent border (same pattern as Settings sidebar)
+- Smooth animated selection
 
-### Component 6 — Settings Panel
+**Right panel** — Template browser
+- **Search bar** at top — filters by title, description, and tags in real time
+- **Results count** label (e.g. "14 templates" or "3 results for 'auth'")
+- **Card grid** (2 columns, responsive) — each card shows:
+  - Category color accent bar on left edge
+  - Template **title** (bold)
+  - **Description** (1 line, muted)
+  - **DSL preview** (first 3–4 lines, monospace, syntax-styled, truncated)
+  - **"Use Template"** button on hover (slides up with animation)
+- Clicking "Use Template" sets `dslInputProvider` to the template's DSL content, navigates to `NavPage.editor`, and shows a flash status "Template loaded"
 
-#### [NEW] `lib/widgets/settings_panel.dart`
-A modal/drawer with:
+**Empty state** — If search returns no results, a friendly message with a search icon.
 
-**Provider selector** — segmented control or dropdown:
-```
-○ None (offline)   ○ Gemini   ○ OpenAI   ○ Anthropic   ○ Ollama
-```
-
-**Dynamic fields** based on selection:
-- Gemini / OpenAI / Anthropic → API Key field (obscured, show/hide toggle) + link to get key
-- Ollama → Base URL field (default: `http://localhost:11434`) + Model name field (e.g. `llama3`)
-- None → message: "Using built-in rule-based parser"
-
-**Status row**: `● AI Active — Gemini` or `○ Offline mode`
-
-Provider get-key links:
-| Provider | Link |
-|---|---|
-| Gemini | `https://aistudio.google.com/apikey` |
-| OpenAI | `https://platform.openai.com/api-keys` |
-| Anthropic | `https://console.anthropic.com/settings/keys` |
-| Ollama | `https://ollama.com/download` |
+**Performance**: All filtering is synchronous on `List<TemplateItem>` — no async, no jank.
 
 ---
 
-### Component 7 — Toolbar Updates
+### 4. Title Bar — Add Templates Tab
 
-#### [MODIFY] `lib/widgets/toolbar.dart`
-- Add **Input Mode toggle**: `DSL` ↔ `Plain Talk` (after app name, before Generate)
-- Add **Settings ⚙ button** (far right) → opens `SettingsPanel`
-- While AI is loading: Generate button shows spinner + `"Thinking…"`
-- Status bar: `Plain Talk → Prompt  •  AI: Gemini` or `AI: Offline`
+#### [MODIFY] `lib/widgets/title_bar.dart`
+Add a "Templates" nav tab between "Editor" and "Settings":
+```dart
+_NavTab(
+  label: 'Templates',
+  icon: Icons.library_books_outlined,
+  active: currentPage == NavPage.templates,
+  onTap: () => ref.read(navPageProvider.notifier).state = NavPage.templates,
+),
+```
 
 ---
 
-### Component 8 — Home Screen
+### 5. App Shell — Register Templates Screen
 
-#### [MODIFY] `lib/screens/home_screen.dart`
-- On startup: load settings → set providers
-- Watch `inputModeProvider` → swap left panel
-- `_generate()`:
-  - DSL mode → `DslParser` (unchanged)
-  - Plain Talk + provider configured → `AiParser.parse()` (async) → on error fall back to `PlainTalkParser`
-  - Plain Talk + no provider → `PlainTalkParser` (sync, instant)
-
----
-
-## Data Flow
-
+#### [MODIFY] `lib/main.dart`
+Add `TemplatesScreen()` to the `IndexedStack`:
+```dart
+IndexedStack(
+  index: page.index,
+  children: const [
+    HomeScreen(),
+    TemplatesScreen(),  // NEW
+    SettingsScreen(),
+  ],
+)
 ```
-User types plain English
-        │
-  inputMode == plainTalk?
-        │
-  Provider configured?
-   ├─ YES → AiParser ──→ Gemini / OpenAI / Anthropic / Ollama
-   │              └── error/timeout ──┐
-   │                                  ▼
-   └─ NO ──────────────→ PlainTalkParser (offline)
-                                  │
-                                  ▼
-                       Map<String, dynamic>
-                                  │
-                                  ▼
-                    PromptBuilder (unchanged)
-                                  │
-                         compact / expanded prompt
-```
+Also add the import for `templates_screen.dart`.
 
 ---
 
 ## Verification Plan
 
-### Build
-```
-flutter pub add http shared_preferences
-flutter build windows --debug
-```
+### Automated
+- `flutter analyze` — no new errors or warnings
+- `flutter test` — existing tests still pass (no logic changes)
 
-### Manual Tests
-1. No provider → Plain Talk uses rule-based parser → instant result
-2. Gemini key → calls Gemini, richer output
-3. OpenAI key → calls OpenAI
-4. Anthropic key → calls Claude
-5. Ollama (running locally) → calls localhost, no key needed
-6. Network off with any key → graceful fallback + status message
-7. DSL mode → completely unchanged behavior
-8. Settings persist after app restart
+### Manual Verification
+1. Build and run: `flutter run -d windows`
+2. Click "Templates" tab — full-screen library loads instantly
+3. Click each category — card grid filters correctly
+4. Type in search bar — results update in real time
+5. Hover a card — "Use Template" button appears with animation
+6. Click "Use Template" — editor is populated, nav switches to Editor tab, status shows "Template loaded"
+7. Verify 80+ templates exist across all categories
+8. Verify DSL content for each template is valid and generates output correctly

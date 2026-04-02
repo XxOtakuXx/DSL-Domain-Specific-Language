@@ -4,6 +4,7 @@ import 'package:window_manager/window_manager.dart';
 import 'providers/dsl_providers.dart';
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/templates_screen.dart';
 import 'theme/app_colors.dart';
 import 'widgets/title_bar.dart';
 
@@ -110,6 +111,7 @@ class _AppShell extends ConsumerWidget {
               index: page.index,
               children: const [
                 HomeScreen(),
+                TemplatesScreen(),
                 SettingsScreen(),
               ],
             ),

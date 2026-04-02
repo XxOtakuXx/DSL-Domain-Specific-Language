@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // ── Navigation ───────────────────────────────────────────────────────────────
 
-enum NavPage { editor, settings }
+enum NavPage { editor, templates, settings }
 
 final navPageProvider = StateProvider<NavPage>((ref) => NavPage.editor);
 
@@ -75,3 +75,11 @@ final isCompactModeProvider = StateProvider<bool>((ref) => true);
 
 /// Transient status message shown in the toolbar (e.g. "Copied!").
 final statusMessageProvider = StateProvider<String>((ref) => '');
+
+// ── Templates ─────────────────────────────────────────────────────────────────
+
+/// Search query on the Templates screen.
+final templateSearchProvider = StateProvider<String>((ref) => '');
+
+/// Selected category filter on the Templates screen (null = All Templates).
+final templateCategoryProvider = StateProvider<String?>((ref) => null);
