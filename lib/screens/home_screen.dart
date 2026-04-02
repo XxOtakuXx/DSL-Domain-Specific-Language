@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/dsl_providers.dart';
+import '../services/ai_parser.dart';
 import '../services/parser.dart';
+import '../services/plain_talk_parser.dart';
 import '../services/prompt_builder.dart';
+import '../services/settings_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/editor.dart';
 import '../widgets/output_panel.dart';
+import '../widgets/plain_talk_editor.dart';
 import '../widgets/toolbar.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -20,14 +24,67 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   double _splitRatio = 0.45;
   double _totalWidth = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    SettingsService().loadSettings().then((data) {
+      if (mounted) {
+        ref.read(selectedProviderIdProvider.notifier).state = data.providerId;
+        ref.read(apiKeyProvider.notifier).state = data.apiKey;
+        ref.read(ollamaModelProvider.notifier).state = data.ollamaModel;
+      }
+    });
+  }
+
   // ── Keyboard shortcut: Ctrl/Cmd + Enter ──────────────────────────────────
 
   void _generate() {
-    final input = ref.read(dslInputProvider);
-    final parser = DslParser();
-    final builder = PromptBuilder();
+    final mode = ref.read(inputModeProvider);
+    if (mode == InputMode.plainTalk) {
+      _generatePlainTalk();
+    } else {
+      _generateDsl();
+    }
+  }
 
-    final parsed = parser.parse(input);
+  void _generateDsl() {
+    final input = ref.read(dslInputProvider);
+    final parsed = DslParser().parse(input);
+    _finishGenerate(parsed);
+  }
+
+  void _generatePlainTalk() {
+    final input = ref.read(plainInputProvider);
+    final providerId = ref.read(selectedProviderIdProvider);
+    final apiKey = ref.read(apiKeyProvider);
+    final ollamaModel = ref.read(ollamaModelProvider);
+
+    if (providerId == AiProviderId.none) {
+      // No provider — rule-based, instant
+      final parsed = PlainTalkParser().parse(input);
+      _finishGenerate(parsed);
+      return;
+    }
+
+    // AI path — async
+    ref.read(isAiLoadingProvider.notifier).state = true;
+    AiParser.parse(
+      input: input,
+      providerId: providerId,
+      apiKey: apiKey,
+      ollamaModel: ollamaModel,
+    ).then((result) {
+      final (parsed, usedAi, error) = result;
+      if (mounted) {
+        ref.read(isAiLoadingProvider.notifier).state = false;
+        _finishGenerate(parsed,
+            statusOverride: usedAi ? null : (error != null ? 'AI error: $error' : 'AI unavailable — used offline parser'));
+      }
+    });
+  }
+
+  void _finishGenerate(Map<String, dynamic> parsed, {String? statusOverride}) {
+    final builder = PromptBuilder();
     ref.read(generatedOutputProvider.notifier).state = GeneratedOutput(
       json: parsed,
       compactPrompt: builder.buildCompact(parsed),
@@ -35,9 +92,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
     final isCompact = ref.read(isCompactModeProvider);
     ref.read(selectedTabProvider.notifier).state = isCompact ? 1 : 2;
-    ref.read(statusMessageProvider.notifier).state = 'Generated';
-    Future.delayed(const Duration(seconds: 2), () {
-      ref.read(statusMessageProvider.notifier).state = '';
+    final msg = statusOverride ?? 'Generated';
+    ref.read(statusMessageProvider.notifier).state = msg;
+    final delay = statusOverride != null ? 8 : 3;
+    Future.delayed(Duration(seconds: delay), () {
+      if (mounted) ref.read(statusMessageProvider.notifier).state = '';
     });
   }
 
@@ -56,7 +115,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           backgroundColor: AppColors.background,
           body: Column(
             children: [
-              const ToolbarWidget(),
+              ToolbarWidget(onGenerate: _generate),
               Container(height: 1, color: AppColors.border),
               Expanded(child: _buildSplitPane()),
               _buildStatusBar(),
@@ -68,14 +127,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildSplitPane() {
+    final isPlainTalk =
+        ref.watch(inputModeProvider) == InputMode.plainTalk;
     return LayoutBuilder(
       builder: (context, constraints) {
         _totalWidth = constraints.maxWidth;
-        final leftWidth = (_totalWidth * _splitRatio).clamp(180.0, _totalWidth - 180);
+        final leftWidth =
+            (_totalWidth * _splitRatio).clamp(180.0, _totalWidth - 180);
 
         return Row(
           children: [
-            SizedBox(width: leftWidth, child: const EditorWidget()),
+            SizedBox(
+              width: leftWidth,
+              child: isPlainTalk
+                  ? const PlainTalkEditor()
+                  : const EditorWidget(),
+            ),
             _buildDivider(),
             const Expanded(child: OutputPanel()),
           ],
@@ -111,6 +178,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildStatusBar() {
+    final isPlainTalk =
+        ref.watch(inputModeProvider) == InputMode.plainTalk;
+    final providerId = ref.watch(selectedProviderIdProvider);
+    final apiKey = ref.watch(apiKeyProvider);
+
+    final aiLabel = providerId == AiProviderId.none
+        ? 'AI: Offline'
+        : (providerId == AiProviderId.ollama || apiKey.isNotEmpty)
+            ? 'AI: ${providerId.name[0].toUpperCase()}${providerId.name.substring(1)}'
+            : 'AI: Offline';
+
+    final modeLabel = isPlainTalk
+        ? 'Plain Talk → Prompt  •  $aiLabel'
+        : 'DSL Prompt Studio  —  Flutter Native Desktop';
+
     return Container(
       height: 22,
       color: AppColors.accentMuted,
@@ -119,9 +201,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           const Icon(Icons.circle, size: 8, color: AppColors.success),
           const SizedBox(width: 6),
-          const Text(
-            'DSL Prompt Studio  —  Flutter Native Desktop',
-            style: TextStyle(
+          Text(
+            modeLabel,
+            style: const TextStyle(
               fontSize: 11,
               color: AppColors.textSecondary,
             ),

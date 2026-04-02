@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
+import 'providers/dsl_providers.dart';
 import 'screens/home_screen.dart';
+import 'screens/settings_screen.dart';
 import 'theme/app_colors.dart';
+import 'widgets/title_bar.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,7 +18,7 @@ Future<void> main() async {
     center: true,
     backgroundColor: Color(0xFF1E1E1E),
     skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.normal,
+    titleBarStyle: TitleBarStyle.hidden,
     title: 'DSL Prompt Studio',
   );
 
@@ -36,7 +39,7 @@ class _App extends StatelessWidget {
       title: 'DSL Prompt Studio',
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(),
-      home: const HomeScreen(),
+      home: const _AppShell(),
     );
   }
 
@@ -82,6 +85,36 @@ class _App extends StatelessWidget {
           side: BorderSide(color: AppColors.border),
         ),
         textStyle: TextStyle(color: AppColors.textPrimary, fontSize: 13),
+      ),
+    );
+  }
+}
+
+// ── App shell: title bar + page router ───────────────────────────────────────
+
+class _AppShell extends ConsumerWidget {
+  const _AppShell();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final page = ref.watch(navPageProvider);
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: const TitleBar(),
+      body: Column(
+        children: [
+          Container(height: 1, color: AppColors.border),
+          Expanded(
+            child: IndexedStack(
+              index: page.index,
+              children: const [
+                HomeScreen(),
+                SettingsScreen(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

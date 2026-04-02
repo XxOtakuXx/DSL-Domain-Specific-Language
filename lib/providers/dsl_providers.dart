@@ -1,5 +1,38 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// ── Navigation ───────────────────────────────────────────────────────────────
+
+enum NavPage { editor, settings }
+
+final navPageProvider = StateProvider<NavPage>((ref) => NavPage.editor);
+
+// ── Input mode ────────────────────────────────────────────────────────────────
+
+enum InputMode { dsl, plainTalk }
+
+/// The current editor mode (strict DSL vs Plain Talk natural language).
+final inputModeProvider = StateProvider<InputMode>((ref) => InputMode.dsl);
+
+/// Raw plain-text input for Plain Talk mode.
+final plainInputProvider = StateProvider<String>((ref) => '');
+
+// ── AI provider selection ─────────────────────────────────────────────────────
+
+enum AiProviderId { none, gemini, openai, anthropic, ollama }
+
+/// Which AI provider is currently selected.
+final selectedProviderIdProvider =
+    StateProvider<AiProviderId>((ref) => AiProviderId.none);
+
+/// API key for the selected provider (Gemini / OpenAI / Anthropic).
+final apiKeyProvider = StateProvider<String>((ref) => '');
+
+/// Ollama model name (e.g. "llama3", "mistral").
+final ollamaModelProvider = StateProvider<String>((ref) => 'llama3');
+
+/// True while the AI API call is in-flight.
+final isAiLoadingProvider = StateProvider<bool>((ref) => false);
+
 const String kDemoInput = '''CREATE app
 TYPE web
 FEATURES login, dashboard, payments

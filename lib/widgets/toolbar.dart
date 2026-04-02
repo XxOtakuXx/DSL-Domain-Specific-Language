@@ -2,38 +2,17 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/dsl_providers.dart';
-import '../services/parser.dart';
-import '../services/prompt_builder.dart';
 import '../services/file_service.dart';
 import '../theme/app_colors.dart';
 
 class ToolbarWidget extends ConsumerWidget {
-  const ToolbarWidget({super.key});
+  const ToolbarWidget({required this.onGenerate, super.key});
 
-  void _generate(WidgetRef ref) {
-    final input = ref.read(dslInputProvider);
-    final parser = DslParser();
-    final builder = PromptBuilder();
-
-    final parsed = parser.parse(input);
-    final compact = builder.buildCompact(parsed);
-    final expanded = builder.buildExpanded(parsed);
-
-    ref.read(generatedOutputProvider.notifier).state = GeneratedOutput(
-      json: parsed,
-      compactPrompt: compact,
-      expandedPrompt: expanded,
-    );
-
-    // Switch to the tab matching the current mode
-    final isCompact = ref.read(isCompactModeProvider);
-    ref.read(selectedTabProvider.notifier).state = isCompact ? 1 : 2;
-
-    _showStatus(ref, 'Generated');
-  }
+  final VoidCallback onGenerate;
 
   void _clear(WidgetRef ref) {
     ref.read(dslInputProvider.notifier).state = '';
+    ref.read(plainInputProvider.notifier).state = '';
     ref.read(generatedOutputProvider.notifier).state = null;
     _showStatus(ref, 'Cleared');
   }
@@ -105,6 +84,18 @@ class ToolbarWidget extends ConsumerWidget {
     final status = ref.watch(statusMessageProvider);
     final isCompact = ref.watch(isCompactModeProvider);
     final hasOutput = ref.watch(generatedOutputProvider) != null;
+    final inputMode = ref.watch(inputModeProvider);
+    final isAiLoading = ref.watch(isAiLoadingProvider);
+    final providerId = ref.watch(selectedProviderIdProvider);
+    final apiKey = ref.watch(apiKeyProvider);
+    final isPlainTalk = inputMode == InputMode.plainTalk;
+    final aiLabel = providerId == AiProviderId.none
+        ? 'AI: Offline'
+        : (providerId == AiProviderId.ollama || apiKey.isNotEmpty)
+            ? 'AI: ${providerId.name[0].toUpperCase()}${providerId.name.substring(1)}'
+            : 'AI: Offline';
+    final aiActive = providerId != AiProviderId.none &&
+        (providerId == AiProviderId.ollama || apiKey.isNotEmpty);
 
     return Container(
       height: 48,
@@ -112,34 +103,28 @@ class ToolbarWidget extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         children: [
-          // App name
-          const Row(
-            children: [
-              Icon(Icons.terminal, size: 16, color: AppColors.accent),
-              SizedBox(width: 8),
-              Text(
-                'DSL Prompt Studio',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ],
+          // Input mode toggle: DSL ↔ Plain Talk
+          _InputModeToggle(
+            isPlainTalk: isPlainTalk,
+            onChanged: (plainTalk) {
+              ref.read(inputModeProvider.notifier).state =
+                  plainTalk ? InputMode.plainTalk : InputMode.dsl;
+            },
           ),
 
-          const SizedBox(width: 20),
+          const SizedBox(width: 12),
           Container(width: 1, height: 24, color: AppColors.divider),
           const SizedBox(width: 12),
 
-          // Generate (primary action)
-          _PrimaryButton(
-            label: 'Generate',
-            icon: Icons.play_arrow_rounded,
-            tooltip: 'Generate output (Ctrl+Enter)',
-            onPressed: () => _generate(ref),
-          ),
+          // Generate (primary action) — shows spinner while AI is loading
+          isAiLoading
+              ? _LoadingButton()
+              : _PrimaryButton(
+                  label: 'Generate',
+                  icon: Icons.play_arrow_rounded,
+                  tooltip: 'Generate output (Ctrl+Enter)',
+                  onPressed: onGenerate,
+                ),
 
           const SizedBox(width: 6),
 
@@ -155,12 +140,11 @@ class ToolbarWidget extends ConsumerWidget {
           Container(width: 1, height: 24, color: AppColors.divider),
           const SizedBox(width: 12),
 
-          // Mode toggle
+          // Output mode toggle (Compact / Expanded)
           _ModeToggle(
             isCompact: isCompact,
             onChanged: (compact) {
               ref.read(isCompactModeProvider.notifier).state = compact;
-              // If output exists, switch to matching tab
               if (hasOutput) {
                 ref.read(selectedTabProvider.notifier).state = compact ? 1 : 2;
               }
@@ -171,21 +155,23 @@ class ToolbarWidget extends ConsumerWidget {
           Container(width: 1, height: 24, color: AppColors.divider),
           const SizedBox(width: 12),
 
-          // File operations
-          _SecondaryButton(
-            label: 'Load',
-            icon: Icons.folder_open_outlined,
-            tooltip: 'Load .dsl file',
-            onPressed: () => _load(ref),
-          ),
-          const SizedBox(width: 6),
-          _SecondaryButton(
-            label: 'Save',
-            icon: Icons.save_outlined,
-            tooltip: 'Save as .dsl',
-            onPressed: () => _save(ref),
-          ),
-          const SizedBox(width: 6),
+          // File operations (DSL mode only)
+          if (!isPlainTalk) ...[
+            _SecondaryButton(
+              label: 'Load',
+              icon: Icons.folder_open_outlined,
+              tooltip: 'Load .dsl file',
+              onPressed: () => _load(ref),
+            ),
+            const SizedBox(width: 6),
+            _SecondaryButton(
+              label: 'Save',
+              icon: Icons.save_outlined,
+              tooltip: 'Save as .dsl',
+              onPressed: () => _save(ref),
+            ),
+            const SizedBox(width: 6),
+          ],
           _SecondaryButton(
             label: 'Export',
             icon: Icons.upload_file_outlined,
@@ -195,6 +181,20 @@ class ToolbarWidget extends ConsumerWidget {
 
           const Spacer(),
 
+          // Status bar: Plain Talk mode AI indicator
+          if (isPlainTalk) ...[
+            Text(
+              aiLabel,
+              style: TextStyle(
+                fontSize: 11,
+                color: aiActive
+                    ? AppColors.success
+                    : AppColors.textDisabled,
+              ),
+            ),
+            const SizedBox(width: 12),
+          ],
+
           // Status message
           if (status.isNotEmpty)
             AnimatedOpacity(
@@ -203,19 +203,30 @@ class ToolbarWidget extends ConsumerWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.check_circle_outline,
-                      size: 14, color: AppColors.success),
+                  Icon(
+                    status.startsWith('AI error:') || status.startsWith('AI unavailable')
+                        ? Icons.warning_amber_rounded
+                        : Icons.check_circle_outline,
+                    size: 14,
+                    color: status.startsWith('AI error:') || status.startsWith('AI unavailable')
+                        ? Colors.orange
+                        : AppColors.success,
+                  ),
                   const SizedBox(width: 5),
                   Text(
                     status,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.success,
+                      color: status.startsWith('AI error:') || status.startsWith('AI unavailable')
+                          ? Colors.orange
+                          : AppColors.success,
                     ),
                   ),
                 ],
               ),
             ),
+
+          const SizedBox(width: 8),
         ],
       ),
     );
@@ -382,6 +393,83 @@ class _ToggleSegment extends StatelessWidget {
             fontWeight: active ? FontWeight.w600 : FontWeight.w400,
             color: active ? AppColors.accent : AppColors.textSecondary,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadingButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 32,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: AppColors.buttonPrimary,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 12,
+            height: 12,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.textOnAccent,
+            ),
+          ),
+          SizedBox(width: 8),
+          Text(
+            'Thinking…',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textOnAccent,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InputModeToggle extends StatelessWidget {
+  const _InputModeToggle({
+    required this.isPlainTalk,
+    required this.onChanged,
+  });
+
+  final bool isPlainTalk;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: 'Switch input mode',
+      child: Container(
+        height: 30,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _ToggleSegment(
+              label: 'DSL',
+              active: !isPlainTalk,
+              onTap: () => onChanged(false),
+            ),
+            Container(width: 1, height: 20, color: AppColors.border),
+            _ToggleSegment(
+              label: 'Plain Talk',
+              active: isPlainTalk,
+              onTap: () => onChanged(true),
+            ),
+          ],
         ),
       ),
     );

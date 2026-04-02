@@ -35,6 +35,8 @@ dependencies:
   flutter_riverpod: ^2.6.1
   file_picker: ^8.1.7
   window_manager: ^0.4.3
+  http: ^1.2.0
+  shared_preferences: ^2.3.0
 
 dev_dependencies:
   flutter_test:

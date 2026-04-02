@@ -195,10 +195,12 @@ class _CodeViewState extends State<_CodeView> {
   // canRequestFocus: false prevents SelectableText from stealing keyboard
   // focus from the editor when output is first rendered.
   final FocusNode _focusNode = FocusNode(canRequestFocus: false);
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void dispose() {
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -216,8 +218,10 @@ class _CodeViewState extends State<_CodeView> {
         ),
         Expanded(
           child: Scrollbar(
+            controller: _scrollController,
             thumbVisibility: true,
             child: SingleChildScrollView(
+              controller: _scrollController,
               padding: const EdgeInsets.all(16),
               child: SelectableText(
                 widget.content,
