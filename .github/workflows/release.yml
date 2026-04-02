@@ -128,7 +128,21 @@ jobs:
           body: |
             ## DSL Prompt Studio ${{ github.ref_name }}
 
-            Native desktop app for Windows, macOS, and Linux — write structured DSL and instantly generate token-optimized AI prompts.
+            Native desktop app for Windows, macOS, and Linux — write structured DSL or plain English and instantly generate token-optimized AI prompts.
+
+            ### What's New in ${{ github.ref_name }}
+
+            **v1.2.0**
+            - **Template Library** — 83 ready-made DSL prompts across 12 categories, searchable and filterable, load into the editor in one click
+            - **Templates tab** added to the title bar navigation
+
+            **v1.1.0**
+            - **Plain Talk mode** — describe what you want in plain English; the app converts it to structured output
+            - **AI provider support** — connect Gemini, OpenAI, Anthropic, or local Ollama for smarter parsing
+            - **Settings tab** — configure and persist your AI provider + API key
+            - Offline rule-based fallback when no AI provider is configured
+
+            ---
 
             ### Downloads
 
@@ -138,12 +152,15 @@ jobs:
             | **macOS** | `DSL-Prompt-Studio-macOS.zip` | Unzip, drag `dsl_domain_specific_language.app` to Applications |
             | **Linux** | `DSL-Prompt-Studio-Linux.tar.gz` | Extract: `tar -xzf *.tar.gz`, run `./dsl_domain_specific_language` |
 
-            ### Requirements
             No Flutter installation needed — these are self-contained release builds.
+
+            ### Requirements
 
             - Windows 10+ (x64)
             - macOS 10.14+ (Mojave)
             - Linux (Ubuntu 22.04+ recommended; requires gtk3)
+
+            > **macOS:** On first launch, right-click the app and choose **Open** to bypass the Gatekeeper warning (app is unsigned).
           draft: false
           prerelease: false
           files: |

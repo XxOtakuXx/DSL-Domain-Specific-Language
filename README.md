@@ -8,6 +8,19 @@ Built with Flutter. No webview. No Electron. Real native performance.
 
 ## Changelog
 
+### v1.2.0
+
+- New: **Template Library** — 83 professionally crafted DSL templates across 12 categories (Software Dev, Mobile, API Design, Content & Writing, AI & Prompts, DevOps, Data & ML, Business, Education, Creative, Legal & HR, Research)
+- New: **Templates tab** in the title bar — browse, search, filter by category, and load any template into the editor in one click
+- New: real-time search filters templates by title, description, and tags
+
+### v1.1.0
+
+- New: **Plain Talk mode** — describe what you want in plain English instead of DSL; the app converts it into structured output
+- New: **AI provider integration** — connect Gemini, OpenAI, Anthropic, or local Ollama for smarter Plain Talk parsing
+- New: **Settings tab** — configure and persist your AI provider and API key
+- New: offline rule-based fallback parser when no AI provider is configured
+
 ### v1.0.2
 
 - Fixed: keys with comma-separated values (e.g. `STACK React, Node.js`) were silently dropped from compact output
@@ -92,23 +105,47 @@ That's **~23 tokens** — **51% fewer tokens**, same information. At scale acros
 ## Screenshots / Layout
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│  DSL Prompt Studio    [Generate] [Clear] [Compact|Expanded]  │
-│                       [Load] [Save] [Export]                 │
-├──────────────────────────┬──────────────────────────────────┤
-│  DSL Editor              │  JSON | Compact Prompt | Expanded │
-│                          │                                   │
-│  1  CREATE app           │  {                                │
-│  2  TYPE web             │    "create": "app",               │
-│  3  FEATURES login,      │    "type": "web",                 │
-│     dashboard            │    "features": [                  │
-│  4  STYLE modern dark    │      "login",                     │
-│  5  OUTPUT full code     │      "dashboard"                  │
-│                          │    ]                              │
-│  ← drag to resize →      │  }                                │
-└──────────────────────────┴──────────────────────────────────┘
-│  ● DSL Prompt Studio — Flutter Native Desktop   Ctrl+Enter  │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│ ⬛ DSL Prompt Studio │ Editor │ Templates │ Settings │ — □ ✕ │
+├──────────────────────────────────────────────────────────────┤
+│  [DSL | Plain Talk]  [Generate] [Clear] [Compact|Expanded]   │
+│  [Load] [Save] [Export]                                      │
+├───────────────────────────┬──────────────────────────────────┤
+│  DSL Editor               │  JSON | Compact Prompt | Expanded│
+│                           │                                  │
+│  1  CREATE app            │  {                               │
+│  2  TYPE web              │    "create": "app",              │
+│  3  FEATURES login,       │    "type": "web",                │
+│     dashboard             │    "features": [                 │
+│  4  STYLE modern dark     │      "login",                    │
+│  5  OUTPUT full code      │      "dashboard"                 │
+│                           │    ]                             │
+│  ← drag to resize →       │  }                               │
+├───────────────────────────┴──────────────────────────────────┤
+│  ● DSL Prompt Studio — Flutter Native Desktop   Ctrl+Enter   │
+└──────────────────────────────────────────────────────────────┘
+```
+
+**Templates tab:**
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│  CATEGORIES          │  🔍 Search templates…                 │
+│  ─────────────────   │  ────────────────────────────────────  │
+│  All Templates  83   │  83 templates                         │
+│  Software Dev   14   │                                       │
+│  Mobile          4   │  ┌──────────────┐ ┌──────────────┐   │
+│  API Design      5   │  │ Full-stack   │ │ REST API     │   │
+│  Content & Writ 10   │  │ Web App      │ │              │   │
+│  AI & Prompts    8   │  │ CREATE app   │ │ CREATE api   │   │
+│  DevOps          7   │  │ TYPE full... │ │ TYPE REST    │   │
+│  Data & ML       7   │  │              │ │              │   │
+│  Business        8   │  └──────────────┘ └──────────────┘   │
+│  Education       5   │                                       │
+│  Creative        5   │  (hover a card → "Use Template" btn)  │
+│  Legal & HR      6   │                                       │
+│  Research        4   │                                       │
+└──────────────────────┴──────────────────────────────────────┘
 ```
 
 ---
@@ -271,7 +308,19 @@ The **Copy** button (top-right of the output panel) copies the current tab's con
 
 ---
 
-### 5. Save and Load Files
+### 5. Use the Template Library
+
+Click the **Templates** tab in the title bar to browse 83 ready-made DSL prompts:
+
+- **Filter by category** — click any category in the left sidebar
+- **Search** — type in the search bar to filter by title, description, or tags
+- **Load a template** — hover a card and click **Use Template** to load it into the editor and jump straight to the Editor tab
+
+Templates cover: Software Dev, Mobile, API Design, Content & Writing, AI & Prompts, DevOps, Data & ML, Business, Education, Creative, Legal & HR, and Research.
+
+---
+
+### 6. Save and Load Files
 
 | Button | What it does |
 | --- | --- |
@@ -279,7 +328,36 @@ The **Copy** button (top-right of the output panel) copies the current tab's con
 | **Save** | Save your current DSL as a `.dsl` file for later |
 | **Export** | Save output as `.json` (JSON tab) or `.txt` (prompt tabs) |
 
-This lets you build a **library of DSL templates** for different use cases.
+---
+
+### 7. Plain Talk Mode
+
+Click **Plain Talk** in the toolbar mode toggle to switch from DSL to natural language input.
+
+Type a plain English description:
+
+> *"Build a React e-commerce site with login, product catalog, shopping cart, and Stripe payments"*
+
+Press **Generate** — the app converts it to structured output exactly like DSL mode.
+
+**With an AI provider configured** (see Settings), the parsing is smarter and handles more complex descriptions.
+
+**Without an AI provider**, the built-in offline rule-based parser handles common intents instantly.
+
+---
+
+### 8. Configure an AI Provider (Optional)
+
+Click the **Settings** tab to set up an AI provider for Plain Talk mode:
+
+| Provider | Cost | Notes |
+| --- | --- | --- |
+| **Gemini** | Free tier available | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
+| **OpenAI** | Paid (gpt-4o-mini) | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| **Anthropic** | Paid (claude-haiku) | [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) |
+| **Ollama** | Free, runs locally | [ollama.com/download](https://ollama.com/download) |
+
+Select your provider, paste your API key, and click **Save**. The setting persists between sessions. DSL mode is unaffected — it never makes network calls.
 
 ---
 
@@ -643,21 +721,37 @@ OUTPUT Go service with proto definitions and Docker setup
 
 ```text
 lib/
-├── main.dart                    Entry point — window config, ProviderScope, theme
+├── main.dart                         Entry point — window config, ProviderScope, theme
 ├── theme/
-│   └── app_colors.dart          VS Code-inspired color palette and text styles
+│   └── app_colors.dart               VS Code-inspired color palette and text styles
 ├── providers/
-│   └── dsl_providers.dart       Riverpod state providers
+│   └── dsl_providers.dart            Riverpod state providers
+├── data/
+│   └── template_library.dart         83 built-in DSL templates (pure Dart, no I/O)
 ├── services/
-│   ├── parser.dart              DSL text → Map<String, dynamic>
-│   ├── prompt_builder.dart      Map → compact prompt / expanded prompt
-│   └── file_service.dart        Load, save, export via file_picker
+│   ├── parser.dart                   DSL text → Map<String, dynamic>
+│   ├── prompt_builder.dart           Map → compact prompt / expanded prompt
+│   ├── plain_talk_parser.dart        Offline rule-based Plain Talk → Map
+│   ├── ai_parser.dart                Dispatches to the configured AI provider
+│   ├── settings_service.dart         Persists provider selection + API key
+│   ├── file_service.dart             Load, save, export via file_picker
+│   └── ai_providers/
+│       ├── ai_provider.dart          Abstract interface
+│       ├── gemini_provider.dart      Gemini 2.0 Flash
+│       ├── openai_provider.dart      GPT-4o-mini
+│       ├── anthropic_provider.dart   Claude Haiku
+│       └── ollama_provider.dart      Local Ollama
 ├── screens/
-│   └── home_screen.dart         Main layout — resizable split pane, keyboard shortcuts
+│   ├── home_screen.dart              Editor — resizable split pane, keyboard shortcuts
+│   ├── templates_screen.dart         Template library — sidebar, search, card grid
+│   └── settings_screen.dart          AI provider configuration
 └── widgets/
-    ├── editor.dart              Syntax-highlighted DSL editor with line numbers
-    ├── output_panel.dart        Tabbed output: JSON / Compact / Expanded
-    └── toolbar.dart             Generate, Clear, mode toggle, file operations
+    ├── editor.dart                   Syntax-highlighted DSL editor with line numbers
+    ├── plain_talk_editor.dart        Plain Talk text field with live detection strip
+    ├── output_panel.dart             Tabbed output: JSON / Compact / Expanded
+    ├── toolbar.dart                  Generate, Clear, mode toggle, file operations
+    ├── settings_panel.dart           Provider selector UI component
+    └── title_bar.dart                Custom title bar with nav tabs + window controls
 ```
 
 ### State Management
@@ -666,11 +760,20 @@ This app uses [Riverpod](https://riverpod.dev/) with simple `StateProvider`s:
 
 | Provider | Type | Purpose |
 | --- | --- | --- |
-| `dslInputProvider` | `StateProvider<String>` | Raw text in the editor |
+| `navPageProvider` | `StateProvider<NavPage>` | Active tab: editor / templates / settings |
+| `dslInputProvider` | `StateProvider<String>` | Raw DSL text in the editor |
+| `plainInputProvider` | `StateProvider<String>` | Raw text in Plain Talk mode |
+| `inputModeProvider` | `StateProvider<InputMode>` | DSL vs Plain Talk |
+| `selectedProviderIdProvider` | `StateProvider<AiProviderId>` | Configured AI provider |
+| `apiKeyProvider` | `StateProvider<String>` | API key for the selected provider |
+| `ollamaModelProvider` | `StateProvider<String>` | Ollama model name |
+| `isAiLoadingProvider` | `StateProvider<bool>` | True while an AI call is in-flight |
 | `generatedOutputProvider` | `StateProvider<GeneratedOutput?>` | Last generated result |
 | `selectedTabProvider` | `StateProvider<int>` | Active output tab (0/1/2) |
 | `isCompactModeProvider` | `StateProvider<bool>` | Compact vs Expanded toggle |
 | `statusMessageProvider` | `StateProvider<String>` | Toolbar status feedback |
+| `templateSearchProvider` | `StateProvider<String>` | Search query on Templates screen |
+| `templateCategoryProvider` | `StateProvider<String?>` | Selected category filter |
 
 ### Parser Logic
 
@@ -726,6 +829,8 @@ Tests cover the parser and prompt builder:
 | State Management | Riverpod 2.x |
 | File I/O | file_picker 8.x |
 | Window Management | window_manager 0.4.x |
+| HTTP (AI providers) | http 1.x |
+| Settings persistence | shared_preferences 2.x |
 | Rendering | Flutter engine (Skia / Impeller) — no webview |
 
 ---
@@ -759,19 +864,25 @@ sudo apt-get install clang cmake ninja-build pkg-config libgtk-3-dev
 ## Frequently Asked Questions
 
 **Q: Does this send my data anywhere?**
-No. The app is fully offline. Nothing leaves your machine. No telemetry, no network calls.
+In DSL mode and Plain Talk with no provider configured: no. Everything is fully offline. If you configure an AI provider in Settings, your Plain Talk input is sent to that provider's API when you press Generate. Your API key is stored locally in the system's shared preferences — it never leaves your machine otherwise.
+
+**Q: Can I use the template library offline?**
+Yes. All 83 templates are compiled into the app as Dart data. No network, no files, no I/O — they load instantly.
 
 **Q: Can I add my own keywords to the compression map?**
 Yes — edit the `_compress` map in [lib/services/prompt_builder.dart](lib/services/prompt_builder.dart). Add any `'input': 'output'` entry.
 
 **Q: Can I use this with any AI?**
-Yes. The output is plain text. Paste the compact or expanded prompt into ChatGPT, Claude, Gemini, Copilot, or any API.
+Yes. The output is plain text. Paste the compact or expanded prompt into ChatGPT, Claude, Gemini, Copilot, or any API. Or configure a provider in Settings to power Plain Talk mode directly.
 
 **Q: What if I use a key that isn't in the examples?**
 It works fine. Unknown keys are included in the output as-is. The parser and builder handle any key generically.
 
 **Q: Can I load existing `.txt` prompt files?**
 Yes. The Load button accepts both `.dsl` and `.txt` files.
+
+**Q: Plain Talk mode gave me a different result than I expected.**
+Without an AI provider, the offline parser uses keyword matching — it works best for common patterns (web app, mobile app, API, etc.). For more nuanced descriptions, configure a provider in Settings. Gemini has a free tier and works well.
 
 **Q: The window is too small / large. Can I resize it?**
 Yes — drag any window edge. The minimum size is 800×560. Your OS remembers the window position.
