@@ -126,41 +126,83 @@ jobs:
         with:
           name: DSL Prompt Studio ${{ github.ref_name }}
           body: |
-            ## DSL Prompt Studio ${{ github.ref_name }}
+            <div align="center">
 
-            Native desktop app for Windows, macOS, and Linux — write structured DSL or plain English and instantly generate token-optimized AI prompts.
+            # DSL Prompt Studio ${{ github.ref_name }}
 
-            ### What's New in ${{ github.ref_name }}
+            **Write structured DSL or plain English. Generate token-optimized AI prompts instantly.**
 
-            **v1.2.0**
-            - **Template Library** — 83 ready-made DSL prompts across 12 categories, searchable and filterable, load into the editor in one click
-            - **Templates tab** added to the title bar navigation
+            Native desktop app — Windows · macOS · Linux · No Flutter required · No internet required
 
-            **v1.1.0**
-            - **Plain Talk mode** — describe what you want in plain English; the app converts it to structured output
-            - **AI provider support** — connect Gemini, OpenAI, Anthropic, or local Ollama for smarter parsing
-            - **Settings tab** — configure and persist your AI provider + API key
-            - Offline rule-based fallback when no AI provider is configured
+            </div>
 
             ---
 
-            ### Downloads
+            ## What's New
 
-            | Platform | File | Instructions |
+            ### ✨ New Features
+
+            - **Template Library** — 83 professionally crafted DSL prompt templates across 12 categories (Software Dev, Mobile, API Design, Content & Writing, AI & Prompts, DevOps, Data & ML, Business, Education, Creative, Legal & HR, Research). Browse, search by keyword, filter by category, and load any template into the editor in one click.
+            - **Templates tab** — new top-level navigation tab alongside Editor and Settings for instant access to the library.
+            - **Plain Talk mode** — switch from DSL syntax to natural language. Describe what you want in plain English and the app converts it to structured output automatically.
+            - **AI provider integration** — connect Gemini, OpenAI (GPT-4o-mini), Anthropic (Claude Haiku), or a local Ollama instance to power Plain Talk parsing. Falls back to a built-in offline rule-based parser when no provider is configured.
+            - **Settings tab** — configure your AI provider, paste your API key, and save — persists between sessions.
+
+            ### 🐛 Bug Fixes
+
+            - Fixed keys with comma-separated values (e.g. `STACK React, Node.js`) being silently dropped from compact prompt output.
+            - Fixed the editor losing keyboard focus after the first Generate — `Ctrl+Enter` now works reliably on every subsequent press.
+
+            ### 📖 Documentation
+
+            - Full key reference cheat sheet added to README — every supported key by category with examples.
+            - Use-case examples added for Web App, Mobile, REST API, GraphQL, Blog Post, CI/CD Pipeline, Database Schema, AI System Prompt, Data Science, and Microservice.
+            - Project structure, state management table, and platform notes fully updated.
+
+            ---
+
+            ## Download
+
+            > These are **self-contained builds**. No Flutter, no runtime, no installer wizard required.
+
+            | Platform | Download | How to run |
             |---|---|---|
-            | **Windows** | `DSL-Prompt-Studio-Windows.zip` | Extract the zip, run `dsl_domain_specific_language.exe` |
-            | **macOS** | `DSL-Prompt-Studio-macOS.zip` | Unzip, drag `dsl_domain_specific_language.app` to Applications |
-            | **Linux** | `DSL-Prompt-Studio-Linux.tar.gz` | Extract: `tar -xzf *.tar.gz`, run `./dsl_domain_specific_language` |
+            | 🪟 **Windows** | `DSL-Prompt-Studio-Windows.zip` | Extract the zip → double-click `dsl_domain_specific_language.exe` |
+            | 🍎 **macOS** | `DSL-Prompt-Studio-macOS.zip` | Unzip → drag `.app` to Applications → double-click to open |
+            | 🐧 **Linux** | `DSL-Prompt-Studio-Linux.tar.gz` | `tar -xzf DSL-Prompt-Studio-Linux.tar.gz` → `./dsl_domain_specific_language` |
 
-            No Flutter installation needed — these are self-contained release builds.
+            > **macOS — first launch:** Right-click the app and choose **Open** to bypass the Gatekeeper warning. The app is not notarized.
 
-            ### Requirements
+            ---
 
-            - Windows 10+ (x64)
-            - macOS 10.14+ (Mojave)
-            - Linux (Ubuntu 22.04+ recommended; requires gtk3)
+            ## System Requirements
 
-            > **macOS:** On first launch, right-click the app and choose **Open** to bypass the Gatekeeper warning (app is unsigned).
+            | Platform | Minimum |
+            |---|---|
+            | Windows | Windows 10 x64 or later |
+            | macOS | macOS 10.14 Mojave or later (Apple Silicon native via Rosetta 2) |
+            | Linux | Ubuntu 22.04+ · requires `libgtk-3` |
+
+            ---
+
+            ## Full Changelog
+
+            | Version | Date | Highlights |
+            |---|---|---|
+            | **v1.2.0** | 2026-04-03 | Template Library (83 templates, 12 categories), Templates tab, Plain Talk mode, AI providers, Settings tab |
+            | **v1.0.2** | 2026-03-29 | Fix: comma-separated values dropped from compact output |
+            | **v1.0.1** | 2026-03-29 | Fix: editor focus lost after first Generate |
+            | **v1.0.0** | 2026-03-29 | Initial release — Windows, macOS, Linux |
+
+            ---
+
+            <div align="center">
+
+            [📖 Documentation](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language#readme) · [🐛 Report a Bug](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language/issues) · [💡 Request a Feature](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language/issues)
+
+            Built with Flutter · MIT License
+
+            </div>
           draft: false
           prerelease: false
           files: |
