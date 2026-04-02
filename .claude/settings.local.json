@@ -3,7 +3,9 @@
     "allow": [
       "Bash(flutter test:*)",
       "Bash(flutter run:*)",
-      "Bash(flutter build:*)"
+      "Bash(flutter build:*)",
+      "Bash(gh run:*)",
+      "Bash(winget list:*)"
     ]
   }
 }

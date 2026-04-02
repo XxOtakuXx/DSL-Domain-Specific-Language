@@ -205,6 +205,7 @@ jobs:
             </div>
           draft: false
           prerelease: false
+          make_latest: true
           files: |
             artifacts/DSL-Prompt-Studio-Windows.zip
             artifacts/DSL-Prompt-Studio-macOS.zip
