@@ -1,7 +1,6 @@
 import 'dart:convert';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'database_helper.dart';
 
 // ── Data model ────────────────────────────────────────────────────────────────
 
@@ -67,34 +66,7 @@ class HistoryService {
   factory HistoryService() => _instance;
   HistoryService._internal();
 
-  Database? _db;
-
-  Future<Database> get _database async {
-    _db ??= await _initDb();
-    return _db!;
-  }
-
-  Future<Database> _initDb() async {
-    final appDir = await getApplicationSupportDirectory();
-    final dbPath = p.join(appDir.path, 'dsl_studio.db');
-    return openDatabase(
-      dbPath,
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp TEXT NOT NULL,
-            input_mode TEXT NOT NULL,
-            dsl_input TEXT NOT NULL,
-            compact_prompt TEXT NOT NULL,
-            expanded_prompt TEXT NOT NULL,
-            json_data TEXT NOT NULL
-          )
-        ''');
-      },
-    );
-  }
+  Future<Database> get _database => DatabaseHelper().database;
 
   /// Insert a new history entry. Keeps only the latest 100 entries.
   Future<void> insert(HistoryEntry entry) async {

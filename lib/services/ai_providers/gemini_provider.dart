@@ -16,7 +16,7 @@ class GeminiProvider implements AiProvider {
   @override
   Future<Map<String, dynamic>> parse(String input) async {
     final uri = Uri.parse(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$_apiKey',
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
     );
     final body = jsonEncode({
       'contents': [
@@ -28,9 +28,14 @@ class GeminiProvider implements AiProvider {
       ],
     });
 
-    final response = await http
-        .post(uri, headers: {'Content-Type': 'application/json'}, body: body)
-        .timeout(const Duration(seconds: 15));
+    final response = await http.post(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': _apiKey,
+      },
+      body: body,
+    ).timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
       throw Exception('Gemini ${response.statusCode}: ${response.body}');

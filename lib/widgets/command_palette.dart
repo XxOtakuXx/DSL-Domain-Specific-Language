@@ -35,6 +35,7 @@ class CommandPalette extends ConsumerStatefulWidget {
 class _CommandPaletteState extends ConsumerState<CommandPalette> {
   final TextEditingController _queryCtrl = TextEditingController();
   final FocusNode _inputFocus = FocusNode();
+  final FocusNode _keyboardFocus = FocusNode();
   final ScrollController _scrollCtrl = ScrollController();
   int _selectedIndex = 0;
 
@@ -196,6 +197,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
     _queryCtrl.removeListener(_onQueryChanged);
     _queryCtrl.dispose();
     _inputFocus.dispose();
+    _keyboardFocus.dispose();
     _scrollCtrl.dispose();
     super.dispose();
   }
@@ -246,7 +248,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
       insetPadding: const EdgeInsets.only(top: 80),
       alignment: Alignment.topCenter,
       child: KeyboardListener(
-        focusNode: FocusNode(),
+        focusNode: _keyboardFocus,
         onKeyEvent: (event) {
           if (event is KeyDownEvent) {
             if (event.logicalKey == LogicalKeyboardKey.arrowDown) {

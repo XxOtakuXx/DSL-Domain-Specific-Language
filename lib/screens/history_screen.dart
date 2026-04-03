@@ -69,10 +69,14 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 
   void _restore(HistoryEntry entry) {
-    ref.read(dslInputProvider.notifier).state = entry.dslInput;
-    ref.read(inputModeProvider.notifier).state = entry.inputMode == 'plainTalk'
-        ? InputMode.plainTalk
-        : InputMode.dsl;
+    final isPlainTalk = entry.inputMode == 'plainTalk';
+    if (isPlainTalk) {
+      ref.read(plainInputProvider.notifier).state = entry.dslInput;
+    } else {
+      ref.read(dslInputProvider.notifier).state = entry.dslInput;
+    }
+    ref.read(inputModeProvider.notifier).state =
+        isPlainTalk ? InputMode.plainTalk : InputMode.dsl;
     ref.read(navPageProvider.notifier).state = NavPage.editor;
     ref.read(statusMessageProvider.notifier).state = 'History loaded';
     Future.delayed(const Duration(seconds: 2), () {

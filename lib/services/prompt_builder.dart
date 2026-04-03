@@ -43,7 +43,7 @@ class PromptBuilder {
 
   String _str(dynamic v) => v is String ? v : '';
   List<String> _list(dynamic v) {
-    if (v is List) return v.cast<String>();
+    if (v is List) return v.map((e) => e.toString()).toList();
     if (v is String) return [v];
     return [];
   }

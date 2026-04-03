@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
@@ -211,7 +210,7 @@ class _CloseButtonState extends State<_CloseButton> {
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
         child: GestureDetector(
-          onTap: () => exit(0),
+          onTap: () => windowManager.close(),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 100),
             width: 46,

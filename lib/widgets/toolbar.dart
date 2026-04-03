@@ -103,7 +103,10 @@ class ToolbarWidget extends ConsumerWidget {
   void _showStatus(WidgetRef ref, String message) {
     ref.read(statusMessageProvider.notifier).state = message;
     Future.delayed(const Duration(seconds: 2), () {
-      ref.read(statusMessageProvider.notifier).state = '';
+      // Only clear if this message is still showing (avoids race with newer messages)
+      if (ref.read(statusMessageProvider) == message) {
+        ref.read(statusMessageProvider.notifier).state = '';
+      }
     });
   }
 
@@ -380,6 +383,7 @@ class _ModeToggle extends StatelessWidget {
             _ToggleSegment(
               label: 'Compact',
               active: isCompact,
+              isLeft: true,
               onTap: () => onChanged(true),
             ),
             Container(width: 1, height: 20, color: AppColors.border),
@@ -400,11 +404,13 @@ class _ToggleSegment extends StatelessWidget {
     required this.label,
     required this.active,
     required this.onTap,
+    this.isLeft = false,
   });
 
   final String label;
   final bool active;
   final VoidCallback onTap;
+  final bool isLeft;
 
   @override
   Widget build(BuildContext context) {
@@ -416,7 +422,7 @@ class _ToggleSegment extends StatelessWidget {
         decoration: BoxDecoration(
           color: active ? AppColors.accentMuted : Colors.transparent,
           borderRadius: active
-              ? (label == 'Compact'
+              ? (isLeft
                   ? const BorderRadius.horizontal(left: Radius.circular(3))
                   : const BorderRadius.horizontal(right: Radius.circular(3)))
               : null,
@@ -496,6 +502,7 @@ class _InputModeToggle extends StatelessWidget {
             _ToggleSegment(
               label: 'DSL',
               active: !isPlainTalk,
+              isLeft: true,
               onTap: () => onChanged(false),
             ),
             Container(width: 1, height: 20, color: AppColors.border),
