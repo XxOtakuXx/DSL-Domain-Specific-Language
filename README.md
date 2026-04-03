@@ -6,9 +6,11 @@ Built with Flutter. No webview. No Electron. Real native performance.
 
 ---
 
-## Changelog
+> **Full version history:** see [CHANGELOG.md](CHANGELOG.md)
 
-### v1.3.0
+## Latest Release — v1.3.0
+
+### What's New
 
 - New: **Generation History** — every prompt you generate is automatically saved; browse, search, restore, or delete entries from the new History tab
 - New: **Custom Templates** — save your own DSL prompts to a personal template library with title, description, category, and tags; browse them alongside built-in templates
@@ -18,31 +20,6 @@ Built with Flutter. No webview. No Electron. Real native performance.
 - New: **Font size controls** — increase or decrease the output panel font size (range: 10–20pt)
 - New: **Word wrap toggle** — switch the output panel between soft-wrapped and horizontally-scrollable views
 - New: **Save Template button** in the toolbar — save the current DSL directly from the editor with a title, description, category, and tags
-
-### v1.2.0
-
-- New: **Template Library** — 83 professionally crafted DSL templates across 12 categories (Software Dev, Mobile, API Design, Content & Writing, AI & Prompts, DevOps, Data & ML, Business, Education, Creative, Legal & HR, Research)
-- New: **Templates tab** in the title bar — browse, search, filter by category, and load any template into the editor in one click
-- New: real-time search filters templates by title, description, and tags
-
-### v1.1.0
-
-- New: **Plain Talk mode** — describe what you want in plain English instead of DSL; the app converts it into structured output
-- New: **AI provider integration** — connect Gemini, OpenAI, Anthropic, or local Ollama for smarter Plain Talk parsing
-- New: **Settings tab** — configure and persist your AI provider and API key
-- New: offline rule-based fallback parser when no AI provider is configured
-
-### v1.0.2
-
-- Fixed: keys with comma-separated values (e.g. `STACK React, Node.js`) were silently dropped from compact output
-
-### v1.0.1
-
-- Fixed: typing in the editor and pressing Ctrl+Enter stopped working after the first Generate
-
-### v1.0.0
-
-- Initial release — Windows, macOS, Linux native desktop builds
 
 ---
 
