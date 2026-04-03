@@ -26,6 +26,18 @@ Versions follow [Semantic Versioning](https://semver.org/).
 - Custom template cards show a `MINE` badge and hover-reveal delete button.
 - History entries display relative timestamps ("just now", "5m ago", "3h ago", "2d ago").
 
+### 🐛 Bug Fixes
+
+- **Security:** Gemini API key moved from URL query parameter to `x-goog-api-key` header — prevents key leaking to logs and proxies.
+- **Security:** Replaced `exit(0)` with `windowManager.close()` for graceful shutdown — prevents SQLite corruption on mid-write exit.
+- **Bug:** History restore now correctly routes Plain Talk entries to the Plain Talk editor instead of the DSL editor.
+- **Bug:** Fixed `List.cast<String>()` crash in prompt builder — now safely maps elements via `.toString()`.
+- **Bug:** Fixed toggle button border radius using hardcoded label check — now uses positional `isLeft` parameter.
+- **Bug:** Fixed status message race condition — rapid messages no longer clear each other prematurely.
+- **Bug:** Fixed `FocusNode` leak in Command Palette — keyboard listener node now properly disposed.
+- **Stability:** Unified database access through shared `DatabaseHelper` singleton — eliminates race condition from two services opening the same SQLite file independently.
+- **Cleanup:** Removed 438 lines of dead code (`settings_panel.dart` — never imported).
+
 ---
 
 ## [v1.2.0] — 2026-04-03
