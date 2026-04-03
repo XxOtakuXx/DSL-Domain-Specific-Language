@@ -8,6 +8,17 @@ Built with Flutter. No webview. No Electron. Real native performance.
 
 ## Changelog
 
+### v1.3.0
+
+- New: **Generation History** — every prompt you generate is automatically saved; browse, search, restore, or delete entries from the new History tab
+- New: **Custom Templates** — save your own DSL prompts to a personal template library with title, description, category, and tags; browse them alongside built-in templates
+- New: **Command Palette** (`Ctrl+P` / `Cmd+P`) — keyboard-first launcher for all actions: generate, switch modes, open templates, clear editor, and more
+- New: **DSL Key Reference** (`Ctrl+Shift+R` / `Cmd+Shift+R`) — in-app cheat sheet with 7 categories of keys and per-row clipboard copy
+- New: **Token counter** — live token estimate displayed in the output panel tab bar for the currently active output tab
+- New: **Font size controls** — increase or decrease the output panel font size (range: 10–20pt)
+- New: **Word wrap toggle** — switch the output panel between soft-wrapped and horizontally-scrollable views
+- New: **Save Template button** in the toolbar — save the current DSL directly from the editor with a title, description, category, and tags
+
 ### v1.2.0
 
 - New: **Template Library** — 83 professionally crafted DSL templates across 12 categories (Software Dev, Mobile, API Design, Content & Writing, AI & Prompts, DevOps, Data & ML, Business, Education, Creative, Legal & HR, Research)
@@ -105,25 +116,26 @@ That's **~23 tokens** — **51% fewer tokens**, same information. At scale acros
 ## Screenshots / Layout
 
 ```text
-┌──────────────────────────────────────────────────────────────┐
-│ ⬛ DSL Prompt Studio │ Editor │ Templates │ Settings │ — □ ✕ │
-├──────────────────────────────────────────────────────────────┤
-│  [DSL | Plain Talk]  [Generate] [Clear] [Compact|Expanded]   │
-│  [Load] [Save] [Export]                                      │
-├───────────────────────────┬──────────────────────────────────┤
-│  DSL Editor               │  JSON | Compact Prompt | Expanded│
-│                           │                                  │
-│  1  CREATE app            │  {                               │
-│  2  TYPE web              │    "create": "app",              │
-│  3  FEATURES login,       │    "type": "web",                │
-│     dashboard             │    "features": [                 │
-│  4  STYLE modern dark     │      "login",                    │
-│  5  OUTPUT full code      │      "dashboard"                 │
-│                           │    ]                             │
-│  ← drag to resize →       │  }                               │
-├───────────────────────────┴──────────────────────────────────┤
-│  ● DSL Prompt Studio — Flutter Native Desktop   Ctrl+Enter   │
-└──────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│ ⬛ DSL Prompt Studio │ Editor │ Templates │ History │ Settings │ — □ ✕ │
+├────────────────────────────────────────────────────────────────────┤
+│  [DSL | Plain Talk]  [Generate] [Clear] [Compact|Expanded]         │
+│  [Load] [Save] [Save Template] [Export]                            │
+├───────────────────────────┬────────────────────────────────────────┤
+│  DSL Editor               │  JSON | Compact Prompt | Expanded      │
+│                           │  ── 142 tokens  A- A+ ⇌ Copy ──        │
+│  1  CREATE app            │                                        │
+│  2  TYPE web              │  {                                     │
+│  3  FEATURES login,       │    "create": "app",                    │
+│     dashboard             │    "type": "web",                      │
+│  4  STYLE modern dark     │    "features": [                       │
+│  5  OUTPUT full code      │      "login",                          │
+│                           │      "dashboard"                       │
+│  ← drag to resize →       │    ]                                   │
+│                           │  }                                     │
+├───────────────────────────┴────────────────────────────────────────┤
+│  ● DSL Prompt Studio — Flutter Native Desktop       Ctrl+Enter     │
+└────────────────────────────────────────────────────────────────────┘
 ```
 
 **Templates tab:**
@@ -145,7 +157,28 @@ That's **~23 tokens** — **51% fewer tokens**, same information. At scale acros
 │  Creative        5   │  (hover a card → "Use Template" btn)  │
 │  Legal & HR      6   │                                       │
 │  Research        4   │                                       │
+│  ─────────────────   │                                       │
+│  My Templates    2   │  (MINE badge on custom cards)         │
 └──────────────────────┴──────────────────────────────────────┘
+```
+
+**History tab:**
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│  History  •  12 entries    🔍 Search history…   [Clear All]  │
+├──────────────────────────────────────────────────────────────┤
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ DSL  Full-stack Web App                       2h ago   │  │
+│  │      TASK: build app TYPE: web STACK: React…           │  │
+│  │                                   [↺ Restore] [🗑 Del] │  │
+│  └────────────────────────────────────────────────────────┘  │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ PT   Build a React e-commerce site with login…  5h ago │  │
+│  │      TASK: build app TYPE: web STACK: React…           │  │
+│  └────────────────────────────────────────────────────────┘  │
+│  …                                                           │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -315,12 +348,66 @@ Click the **Templates** tab in the title bar to browse 83 ready-made DSL prompts
 - **Filter by category** — click any category in the left sidebar
 - **Search** — type in the search bar to filter by title, description, or tags
 - **Load a template** — hover a card and click **Use Template** to load it into the editor and jump straight to the Editor tab
+- **My Templates** section appears in the sidebar once you have saved any custom templates
 
 Templates cover: Software Dev, Mobile, API Design, Content & Writing, AI & Prompts, DevOps, Data & ML, Business, Education, Creative, Legal & HR, and Research.
 
 ---
 
-### 6. Save and Load Files
+### 6. Save Custom Templates
+
+In the Editor (DSL mode), click **Save Template** in the toolbar to save the current DSL to your personal library:
+
+- Enter a **title** (required)
+- Optionally add a **description**, **category**, and **comma-separated tags**
+- Your template is saved locally to `dsl_studio.db` and appears in the Templates screen under **My Templates**
+- Custom templates can be deleted by hovering the card and clicking the delete icon
+
+---
+
+### 7. Browse Generation History
+
+Click the **History** tab to see every prompt you have generated in this session and across past sessions (up to 100 entries):
+
+- Entries are sorted newest-first with relative timestamps ("just now", "5m ago", "3d ago")
+- **DSL** or **PT** badge shows which mode produced the entry
+- **Restore** (↺ icon on hover) — loads the original input back into the editor and returns to the Editor tab
+- **Delete** (trash icon on hover) — removes that entry
+- **Clear All** — deletes all history after a confirmation dialog
+- **Search** — filters by title, DSL input, or compact prompt content
+
+---
+
+### 8. Command Palette
+
+Press `Ctrl+P` (Windows/Linux) or `Cmd+P` (macOS) to open the Command Palette — a keyboard-first launcher for all major actions:
+
+| Command | What it does |
+| --- | --- |
+| Generate | Run the generator (same as Ctrl+Enter) |
+| Switch to DSL / Plain Talk | Toggle input mode |
+| Open Templates | Navigate to the Templates tab |
+| Open History | Navigate to the History tab |
+| Open Settings | Navigate to the Settings tab |
+| Clear Editor | Wipe the current input |
+| Load File | Open a DSL/txt file |
+| Save File | Save to disk |
+| Save Template | Save current DSL as a custom template |
+| Export Output | Export JSON/prompt to file |
+| Toggle Compact/Expanded | Switch output mode |
+| DSL Key Reference | Open the in-app cheat sheet |
+
+Navigate with ↑ / ↓ arrows, confirm with **Enter**, dismiss with **Esc**.
+
+---
+
+### 9. DSL Key Reference
+
+Press `Ctrl+Shift+R` (Windows/Linux) or `Cmd+Shift+R` (macOS) to open the DSL Key Reference panel — a searchable, categorized cheat sheet of all supported keys with one-click copy per row.
+
+---
+
+### 10. Save and Load Files
 
 | Button | What it does |
 | --- | --- |
@@ -330,7 +417,7 @@ Templates cover: Software Dev, Mobile, API Design, Content & Writing, AI & Promp
 
 ---
 
-### 7. Plain Talk Mode
+### 11. Plain Talk Mode
 
 Click **Plain Talk** in the toolbar mode toggle to switch from DSL to natural language input.
 
@@ -346,7 +433,7 @@ Press **Generate** — the app converts it to structured output exactly like DSL
 
 ---
 
-### 8. Configure an AI Provider (Optional)
+### 12. Configure an AI Provider (Optional)
 
 Click the **Settings** tab to set up an AI provider for Plain Talk mode:
 
@@ -725,7 +812,7 @@ lib/
 ├── theme/
 │   └── app_colors.dart               VS Code-inspired color palette and text styles
 ├── providers/
-│   └── dsl_providers.dart            Riverpod state providers
+│   └── dsl_providers.dart            Riverpod state providers (14 providers)
 ├── data/
 │   └── template_library.dart         83 built-in DSL templates (pure Dart, no I/O)
 ├── services/
@@ -735,6 +822,9 @@ lib/
 │   ├── ai_parser.dart                Dispatches to the configured AI provider
 │   ├── settings_service.dart         Persists provider selection + API key
 │   ├── file_service.dart             Load, save, export via file_picker
+│   ├── history_service.dart          SQLite-backed generation history (max 100)
+│   ├── custom_template_service.dart  SQLite-backed personal template library
+│   ├── token_counter.dart            Approximate token count for output display
 │   └── ai_providers/
 │       ├── ai_provider.dart          Abstract interface
 │       ├── gemini_provider.dart      Gemini 2.0 Flash
@@ -743,13 +833,15 @@ lib/
 │       └── ollama_provider.dart      Local Ollama
 ├── screens/
 │   ├── home_screen.dart              Editor — resizable split pane, keyboard shortcuts
-│   ├── templates_screen.dart         Template library — sidebar, search, card grid
+│   ├── templates_screen.dart         Built-in + custom template library
+│   ├── history_screen.dart           Generation history browser
 │   └── settings_screen.dart          AI provider configuration
 └── widgets/
     ├── editor.dart                   Syntax-highlighted DSL editor with line numbers
     ├── plain_talk_editor.dart        Plain Talk text field with live detection strip
-    ├── output_panel.dart             Tabbed output: JSON / Compact / Expanded
-    ├── toolbar.dart                  Generate, Clear, mode toggle, file operations
+    ├── output_panel.dart             Tabbed output with token count, font size, word wrap
+    ├── toolbar.dart                  Generate, Clear, Save Template, mode toggle, file ops
+    ├── command_palette.dart          Ctrl+P command launcher + DSL reference panel
     ├── settings_panel.dart           Provider selector UI component
     └── title_bar.dart                Custom title bar with nav tabs + window controls
 ```
@@ -760,7 +852,7 @@ This app uses [Riverpod](https://riverpod.dev/) with simple `StateProvider`s:
 
 | Provider | Type | Purpose |
 | --- | --- | --- |
-| `navPageProvider` | `StateProvider<NavPage>` | Active tab: editor / templates / settings |
+| `navPageProvider` | `StateProvider<NavPage>` | Active tab: editor / templates / history / settings |
 | `dslInputProvider` | `StateProvider<String>` | Raw DSL text in the editor |
 | `plainInputProvider` | `StateProvider<String>` | Raw text in Plain Talk mode |
 | `inputModeProvider` | `StateProvider<InputMode>` | DSL vs Plain Talk |
@@ -774,6 +866,9 @@ This app uses [Riverpod](https://riverpod.dev/) with simple `StateProvider`s:
 | `statusMessageProvider` | `StateProvider<String>` | Toolbar status feedback |
 | `templateSearchProvider` | `StateProvider<String>` | Search query on Templates screen |
 | `templateCategoryProvider` | `StateProvider<String?>` | Selected category filter |
+| `historyProvider` | `StateProvider<List<HistoryEntry>>` | Loaded history entries |
+| `historySearchProvider` | `StateProvider<String>` | Search query on History screen |
+| `customTemplatesProvider` | `StateProvider<List<CustomTemplate>>` | Loaded custom templates |
 
 ### Parser Logic
 
@@ -831,6 +926,8 @@ Tests cover the parser and prompt builder:
 | Window Management | window_manager 0.4.x |
 | HTTP (AI providers) | http 1.x |
 | Settings persistence | shared_preferences 2.x |
+| Local database | sqflite 2.x (SQLite — history + custom templates) |
+| App data path | path_provider 2.x |
 | Rendering | Flutter engine (Skia / Impeller) — no webview |
 
 ---
@@ -883,6 +980,15 @@ Yes. The Load button accepts both `.dsl` and `.txt` files.
 
 **Q: Plain Talk mode gave me a different result than I expected.**
 Without an AI provider, the offline parser uses keyword matching — it works best for common patterns (web app, mobile app, API, etc.). For more nuanced descriptions, configure a provider in Settings. Gemini has a free tier and works well.
+
+**Q: Where is my history and custom templates stored?**
+In a SQLite database (`dsl_studio.db`) inside your system's app support directory — `%APPDATA%\dsl_domain_specific_language` on Windows, `~/Library/Application Support/dsl_domain_specific_language` on macOS. History is capped at 100 entries (oldest are automatically removed).
+
+**Q: Can I use the Command Palette with the keyboard only?**
+Yes. `Ctrl+P` opens it, ↑ / ↓ navigate the list, `Enter` executes the selected command, `Esc` dismisses it. No mouse required.
+
+**Q: How is the token count calculated?**
+It's an approximation: word count × 1.0. Real token counts vary by model and tokenizer (typically 0.75–1.3 tokens per word). The count is for ballpark comparison — not billing-accurate.
 
 **Q: The window is too small / large. Can I resize it?**
 Yes — drag any window edge. The minimum size is 800×560. Your OS remembers the window position.
