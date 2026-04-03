@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../services/history_service.dart';
+import '../services/custom_template_service.dart';
 
 // ── Navigation ───────────────────────────────────────────────────────────────
 
-enum NavPage { editor, templates, settings }
+enum NavPage { editor, templates, history, settings }
 
 final navPageProvider = StateProvider<NavPage>((ref) => NavPage.editor);
 
@@ -83,3 +85,18 @@ final templateSearchProvider = StateProvider<String>((ref) => '');
 
 /// Selected category filter on the Templates screen (null = All Templates).
 final templateCategoryProvider = StateProvider<String?>((ref) => null);
+
+// ── History ───────────────────────────────────────────────────────────────────
+
+/// Loaded history entries for the History screen.
+final historyProvider =
+    StateProvider<List<HistoryEntry>>((ref) => []);
+
+/// Search query on the History screen.
+final historySearchProvider = StateProvider<String>((ref) => '');
+
+// ── Custom Templates ──────────────────────────────────────────────────────────
+
+/// User-saved custom templates.
+final customTemplatesProvider =
+    StateProvider<List<CustomTemplate>>((ref) => []);

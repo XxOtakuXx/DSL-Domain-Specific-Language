@@ -59,6 +59,12 @@ class TitleBar extends ConsumerWidget implements PreferredSizeWidget {
               onTap: () => ref.read(navPageProvider.notifier).state = NavPage.templates,
             ),
             _NavTab(
+              label: 'History',
+              icon: Icons.history,
+              active: currentPage == NavPage.history,
+              onTap: () => ref.read(navPageProvider.notifier).state = NavPage.history,
+            ),
+            _NavTab(
               label: 'Settings',
               icon: Icons.settings_outlined,
               active: currentPage == NavPage.settings,

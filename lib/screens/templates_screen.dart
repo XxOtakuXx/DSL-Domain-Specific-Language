@@ -2,7 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/template_library.dart';
 import '../providers/dsl_providers.dart';
+import '../services/custom_template_service.dart';
 import '../theme/app_colors.dart';
+
+// ── Unified template card model ───────────────────────────────────────────────
+
+class _CardData {
+  const _CardData({
+    required this.title,
+    required this.description,
+    required this.category,
+    required this.dsl,
+    this.isCustom = false,
+    this.customId,
+  });
+  final String title;
+  final String description;
+  final String category;
+  final String dsl;
+  final bool isCustom;
+  final int? customId;
+}
+
+// ── Screen ────────────────────────────────────────────────────────────────────
 
 class TemplatesScreen extends ConsumerStatefulWidget {
   const TemplatesScreen({super.key});
@@ -18,6 +40,7 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    _loadCustomTemplates();
   }
 
   @override
@@ -26,49 +49,79 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
     super.dispose();
   }
 
-  List<TemplateItem> _filteredTemplates(String? category, String query) {
-    var items = kTemplates;
+  Future<void> _loadCustomTemplates() async {
+    final all = await CustomTemplateService().loadAll();
+    if (mounted) ref.read(customTemplatesProvider.notifier).state = all;
+  }
 
+  List<_CardData> _allCards(List<CustomTemplate> custom) {
+    final builtIn = kTemplates.map((t) => _CardData(
+          title: t.title,
+          description: t.description,
+          category: t.category,
+          dsl: t.dsl,
+        ));
+    final userCards = custom.map((t) => _CardData(
+          title: t.title,
+          description: t.description,
+          category: t.category,
+          dsl: t.dsl,
+          isCustom: true,
+          customId: t.id,
+        ));
+    return [...userCards, ...builtIn];
+  }
+
+  List<_CardData> _filtered(
+      List<_CardData> all, String? category, String query) {
+    var items = all;
     if (category != null) {
       items = items.where((t) => t.category == category).toList();
     }
-
     if (query.isNotEmpty) {
       final q = query.toLowerCase();
-      items = items.where((t) {
-        return t.title.toLowerCase().contains(q) ||
-            t.description.toLowerCase().contains(q) ||
-            t.tags.any((tag) => tag.toLowerCase().contains(q));
-      }).toList();
+      items = items
+          .where((t) =>
+              t.title.toLowerCase().contains(q) ||
+              t.description.toLowerCase().contains(q) ||
+              t.dsl.toLowerCase().contains(q))
+          .toList();
     }
-
     return items;
   }
 
-  void _useTemplate(TemplateItem template) {
-    ref.read(dslInputProvider.notifier).state = template.dsl;
+  void _useTemplate(_CardData card) {
+    ref.read(dslInputProvider.notifier).state = card.dsl;
     ref.read(navPageProvider.notifier).state = NavPage.editor;
     ref.read(statusMessageProvider.notifier).state = 'Template loaded';
     Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        ref.read(statusMessageProvider.notifier).state = '';
-      }
+      if (mounted) ref.read(statusMessageProvider.notifier).state = '';
     });
+  }
+
+  Future<void> _deleteCustomTemplate(int id) async {
+    await CustomTemplateService().delete(id);
+    await _loadCustomTemplates();
   }
 
   @override
   Widget build(BuildContext context) {
+    final custom = ref.watch(customTemplatesProvider);
     final selectedCategory = ref.watch(templateCategoryProvider);
     final searchQuery = ref.watch(templateSearchProvider);
-    final filtered = _filteredTemplates(selectedCategory, searchQuery);
+    final all = _allCards(custom);
+    final filtered = _filtered(all, selectedCategory, searchQuery);
+    final totalCustom = custom.length;
+    final totalBuiltIn = kTemplates.length;
 
     return Row(
       children: [
         _CategorySidebar(
           selectedCategory: selectedCategory,
-          onCategorySelected: (cat) {
-            ref.read(templateCategoryProvider.notifier).state = cat;
-          },
+          customCount: totalCustom,
+          builtInCount: totalBuiltIn,
+          onCategorySelected: (cat) =>
+              ref.read(templateCategoryProvider.notifier).state = cat,
         ),
         Container(width: 1, color: AppColors.border),
         Expanded(
@@ -76,6 +129,7 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
             children: [
               _SearchBar(
                 controller: _searchController,
+                query: searchQuery,
                 onChanged: (v) =>
                     ref.read(templateSearchProvider.notifier).state = v,
                 onClear: () {
@@ -91,6 +145,7 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                     : _TemplateGrid(
                         templates: filtered,
                         onUse: _useTemplate,
+                        onDelete: (id) => _deleteCustomTemplate(id),
                       ),
               ),
             ],
@@ -106,10 +161,14 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
 class _CategorySidebar extends StatelessWidget {
   const _CategorySidebar({
     required this.selectedCategory,
+    required this.customCount,
+    required this.builtInCount,
     required this.onCategorySelected,
   });
 
   final String? selectedCategory;
+  final int customCount;
+  final int builtInCount;
   final ValueChanged<String?> onCategorySelected;
 
   @override
@@ -122,7 +181,7 @@ class _CategorySidebar extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-            child: Text(
+            child: const Text(
               'CATEGORIES',
               style: TextStyle(
                 fontSize: 10,
@@ -135,10 +194,20 @@ class _CategorySidebar extends StatelessWidget {
           _SidebarItem(
             label: 'All Templates',
             icon: Icons.grid_view,
-            count: kTemplates.length,
+            count: builtInCount + customCount,
             active: selectedCategory == null,
             onTap: () => onCategorySelected(null),
           ),
+          if (customCount > 0) ...[
+            _SidebarItem(
+              label: 'My Templates',
+              icon: Icons.bookmark_outlined,
+              count: customCount,
+              active: selectedCategory == 'My Templates',
+              onTap: () => onCategorySelected('My Templates'),
+              highlight: true,
+            ),
+          ],
           const Divider(color: AppColors.border, height: 1, thickness: 1),
           const SizedBox(height: 4),
           Expanded(
@@ -147,7 +216,8 @@ class _CategorySidebar extends StatelessWidget {
               itemCount: kTemplateCategories.length,
               itemBuilder: (context, i) {
                 final cat = kTemplateCategories[i];
-                final count = kTemplates.where((t) => t.category == cat.name).length;
+                final count =
+                    kTemplates.where((t) => t.category == cat.name).length;
                 return _SidebarItem(
                   label: cat.name,
                   icon: cat.icon,
@@ -171,6 +241,7 @@ class _SidebarItem extends StatefulWidget {
     required this.count,
     required this.active,
     required this.onTap,
+    this.highlight = false,
   });
 
   final String label;
@@ -178,6 +249,7 @@ class _SidebarItem extends StatefulWidget {
   final int count;
   final bool active;
   final VoidCallback onTap;
+  final bool highlight;
 
   @override
   State<_SidebarItem> createState() => _SidebarItemState();
@@ -188,6 +260,12 @@ class _SidebarItemState extends State<_SidebarItem> {
 
   @override
   Widget build(BuildContext context) {
+    final labelColor = widget.highlight && !widget.active
+        ? AppColors.accent
+        : widget.active
+            ? AppColors.textPrimary
+            : AppColors.textSecondary;
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
@@ -213,30 +291,24 @@ class _SidebarItemState extends State<_SidebarItem> {
           ),
           child: Row(
             children: [
-              Icon(
-                widget.icon,
-                size: 13,
-                color: widget.active
-                    ? AppColors.textPrimary
-                    : AppColors.textSecondary,
-              ),
+              Icon(widget.icon, size: 13, color: labelColor),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   widget.label,
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight:
-                        widget.active ? FontWeight.w600 : FontWeight.w400,
-                    color: widget.active
-                        ? AppColors.textPrimary
-                        : AppColors.textSecondary,
+                    fontWeight: widget.active || widget.highlight
+                        ? FontWeight.w600
+                        : FontWeight.w400,
+                    color: labelColor,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                 decoration: BoxDecoration(
                   color: widget.active
                       ? AppColors.accentMuted
@@ -262,18 +334,39 @@ class _SidebarItemState extends State<_SidebarItem> {
   }
 }
 
-// ── Search bar ────────────────────────────────────────────────────────────────
+// ── Search bar (stateful to fix clear button reactivity) ──────────────────────
 
-class _SearchBar extends StatelessWidget {
+class _SearchBar extends StatefulWidget {
   const _SearchBar({
     required this.controller,
+    required this.query,
     required this.onChanged,
     required this.onClear,
   });
 
   final TextEditingController controller;
+  final String query;
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
+
+  @override
+  State<_SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<_SearchBar> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_rebuild);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_rebuild);
+    super.dispose();
+  }
+
+  void _rebuild() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -282,34 +375,27 @@ class _SearchBar extends StatelessWidget {
       color: AppColors.surface,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: TextField(
-        controller: controller,
-        onChanged: onChanged,
-        style: const TextStyle(
-          fontSize: 13,
-          color: AppColors.textPrimary,
-        ),
+        controller: widget.controller,
+        onChanged: widget.onChanged,
+        style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
         decoration: InputDecoration(
-          hintText: 'Search templates by title, description, or tags…',
+          hintText: 'Search templates by title, description, or DSL…',
           hintStyle: const TextStyle(
-            fontSize: 13,
-            color: AppColors.textSecondary,
-          ),
+              fontSize: 13, color: AppColors.textSecondary),
           prefixIcon: const Padding(
             padding: EdgeInsets.only(left: 4, right: 8),
-            child: Icon(Icons.search, size: 16, color: AppColors.textSecondary),
+            child:
+                Icon(Icons.search, size: 16, color: AppColors.textSecondary),
           ),
           prefixIconConstraints:
               const BoxConstraints(minWidth: 36, minHeight: 36),
-          suffixIcon: controller.text.isNotEmpty
+          suffixIcon: widget.controller.text.isNotEmpty
               ? GestureDetector(
-                  onTap: onClear,
+                  onTap: widget.onClear,
                   child: MouseRegion(
                     cursor: SystemMouseCursors.click,
-                    child: const Icon(
-                      Icons.close,
-                      size: 14,
-                      color: AppColors.textSecondary,
-                    ),
+                    child: const Icon(Icons.close,
+                        size: 14, color: AppColors.textSecondary),
                   ),
                 )
               : null,
@@ -354,14 +440,11 @@ class _ResultsHeader extends StatelessWidget {
       color: AppColors.surface,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       alignment: Alignment.centerLeft,
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 11,
-          color: AppColors.textSecondary,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
+      child: Text(label,
+          style: const TextStyle(
+              fontSize: 11,
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500)),
     );
   }
 }
@@ -369,10 +452,15 @@ class _ResultsHeader extends StatelessWidget {
 // ── Template grid ─────────────────────────────────────────────────────────────
 
 class _TemplateGrid extends StatelessWidget {
-  const _TemplateGrid({required this.templates, required this.onUse});
+  const _TemplateGrid({
+    required this.templates,
+    required this.onUse,
+    required this.onDelete,
+  });
 
-  final List<TemplateItem> templates;
-  final ValueChanged<TemplateItem> onUse;
+  final List<_CardData> templates;
+  final ValueChanged<_CardData> onUse;
+  final ValueChanged<int> onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -387,8 +475,11 @@ class _TemplateGrid extends StatelessWidget {
         ),
         itemCount: templates.length,
         itemBuilder: (context, i) => _TemplateCard(
-          template: templates[i],
+          card: templates[i],
           onUse: () => onUse(templates[i]),
+          onDelete: templates[i].isCustom && templates[i].customId != null
+              ? () => onDelete(templates[i].customId!)
+              : null,
         ),
       ),
     );
@@ -410,13 +501,19 @@ const Map<String, Color> _categoryColors = {
   'Creative': Color(0xFFD7BA7D),
   'Legal & HR': Color(0xFF858585),
   'Research': Color(0xFF9CDCFE),
+  'My Templates': Color(0xFF0078D4),
 };
 
 class _TemplateCard extends StatefulWidget {
-  const _TemplateCard({required this.template, required this.onUse});
+  const _TemplateCard({
+    required this.card,
+    required this.onUse,
+    this.onDelete,
+  });
 
-  final TemplateItem template;
+  final _CardData card;
   final VoidCallback onUse;
+  final VoidCallback? onDelete;
 
   @override
   State<_TemplateCard> createState() => _TemplateCardState();
@@ -439,7 +536,8 @@ class _TemplateCardState extends State<_TemplateCard>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOut));
+    ).animate(
+        CurvedAnimation(parent: _animController, curve: Curves.easeOut));
     _fadeAnimation =
         Tween<double>(begin: 0, end: 1).animate(_animController);
   }
@@ -463,11 +561,8 @@ class _TemplateCardState extends State<_TemplateCard>
   @override
   Widget build(BuildContext context) {
     final accentColor =
-        _categoryColors[widget.template.category] ?? AppColors.accent;
-    final previewLines = widget.template.dsl
-        .split('\n')
-        .take(4)
-        .join('\n');
+        _categoryColors[widget.card.category] ?? AppColors.accent;
+    final preview = widget.card.dsl.split('\n').take(4).join('\n');
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -476,7 +571,8 @@ class _TemplateCardState extends State<_TemplateCard>
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 120),
         decoration: BoxDecoration(
-          color: _hovered ? AppColors.surfaceElevated : AppColors.surface,
+          color:
+              _hovered ? AppColors.surfaceElevated : AppColors.surface,
           borderRadius: BorderRadius.circular(4),
           border: Border.all(
             color: _hovered ? AppColors.divider : AppColors.border,
@@ -500,36 +596,51 @@ class _TemplateCardState extends State<_TemplateCard>
                 ),
               ),
             ),
+            // Custom badge
+            if (widget.card.isCustom)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 5, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.accentMuted,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  child: const Text(
+                    'MINE',
+                    style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.accent),
+                  ),
+                ),
+              ),
             // Card content
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title
                   Text(
-                    widget.template.title,
+                    widget.card.title,
                     style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
-                  // Description
                   Text(
-                    widget.template.description,
+                    widget.card.description,
                     style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textSecondary,
-                    ),
+                        fontSize: 11, color: AppColors.textSecondary),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
-                  // DSL preview
                   Expanded(
                     child: Container(
                       width: double.infinity,
@@ -539,7 +650,7 @@ class _TemplateCardState extends State<_TemplateCard>
                         borderRadius: BorderRadius.circular(3),
                       ),
                       child: Text(
-                        previewLines,
+                        preview,
                         style: const TextStyle(
                           fontFamily: 'Consolas',
                           fontSize: 10.5,
@@ -553,7 +664,7 @@ class _TemplateCardState extends State<_TemplateCard>
                 ],
               ),
             ),
-            // Hover: Use Template button
+            // Hover action buttons
             Positioned(
               bottom: 10,
               right: 10,
@@ -561,25 +672,46 @@ class _TemplateCardState extends State<_TemplateCard>
                 opacity: _fadeAnimation,
                 child: SlideTransition(
                   position: _slideAnimation,
-                  child: GestureDetector(
-                    onTap: widget.onUse,
-                    child: Container(
-                      height: 26,
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: AppColors.accent,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Use Template',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Delete button (custom only)
+                      if (widget.onDelete != null) ...[
+                        GestureDetector(
+                          onTap: widget.onDelete,
+                          child: Container(
+                            height: 26,
+                            width: 26,
+                            decoration: BoxDecoration(
+                              color: AppColors.buttonDanger,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                            child: const Icon(Icons.delete_outline,
+                                size: 14, color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                      ],
+                      GestureDetector(
+                        onTap: widget.onUse,
+                        child: Container(
+                          height: 26,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: AppColors.accent,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'Use Template',
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -604,19 +736,15 @@ class _EmptyState extends StatelessWidget {
         children: const [
           Icon(Icons.search_off, size: 48, color: AppColors.textDisabled),
           SizedBox(height: 12),
-          Text(
-            'No templates found',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
-          ),
+          Text('No templates found',
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary)),
           SizedBox(height: 6),
-          Text(
-            'Try a different search term or category',
-            style: TextStyle(fontSize: 13, color: AppColors.textDisabled),
-          ),
+          Text('Try a different search term or category',
+              style:
+                  TextStyle(fontSize: 13, color: AppColors.textDisabled)),
         ],
       ),
     );

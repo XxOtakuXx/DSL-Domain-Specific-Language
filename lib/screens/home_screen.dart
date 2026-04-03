@@ -3,11 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/dsl_providers.dart';
 import '../services/ai_parser.dart';
+import '../services/history_service.dart';
 import '../services/parser.dart';
 import '../services/plain_talk_parser.dart';
 import '../services/prompt_builder.dart';
 import '../services/settings_service.dart';
 import '../theme/app_colors.dart';
+import '../widgets/command_palette.dart';
 import '../widgets/editor.dart';
 import '../widgets/output_panel.dart';
 import '../widgets/plain_talk_editor.dart';
@@ -85,10 +87,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _finishGenerate(Map<String, dynamic> parsed, {String? statusOverride}) {
     final builder = PromptBuilder();
+    final compact = builder.buildCompact(parsed);
+    final expanded = builder.buildExpanded(parsed);
     ref.read(generatedOutputProvider.notifier).state = GeneratedOutput(
       json: parsed,
-      compactPrompt: builder.buildCompact(parsed),
-      expandedPrompt: builder.buildExpanded(parsed),
+      compactPrompt: compact,
+      expandedPrompt: expanded,
     );
     final isCompact = ref.read(isCompactModeProvider);
     ref.read(selectedTabProvider.notifier).state = isCompact ? 1 : 2;
@@ -98,6 +102,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Future.delayed(Duration(seconds: delay), () {
       if (mounted) ref.read(statusMessageProvider.notifier).state = '';
     });
+
+    // Save to history (fire-and-forget)
+    final mode = ref.read(inputModeProvider);
+    final dslInput = mode == InputMode.dsl
+        ? ref.read(dslInputProvider)
+        : ref.read(plainInputProvider);
+    HistoryService().insert(HistoryEntry(
+      id: 0,
+      timestamp: DateTime.now(),
+      inputMode: mode == InputMode.plainTalk ? 'plainTalk' : 'dsl',
+      dslInput: dslInput,
+      compactPrompt: compact,
+      expandedPrompt: expanded,
+      json: parsed,
+    ));
   }
 
   @override
@@ -108,6 +127,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             _generate,
         const SingleActivator(LogicalKeyboardKey.enter, meta: true):
             _generate,
+        const SingleActivator(LogicalKeyboardKey.keyP, control: true): () {
+          showDialog(
+            context: context,
+            barrierColor: Colors.black54,
+            builder: (_) => CommandPalette(onGenerate: _generate),
+          );
+        },
+        const SingleActivator(LogicalKeyboardKey.keyP, meta: true): () {
+          showDialog(
+            context: context,
+            barrierColor: Colors.black54,
+            builder: (_) => CommandPalette(onGenerate: _generate),
+          );
+        },
+        const SingleActivator(LogicalKeyboardKey.keyR,
+            control: true, shift: true): () => showDslReference(context),
+        const SingleActivator(LogicalKeyboardKey.keyR,
+            meta: true, shift: true): () => showDslReference(context),
       },
       child: Focus(
         autofocus: true,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/dsl_providers.dart';
+import '../services/token_counter.dart';
 import '../theme/app_colors.dart';
 
 class OutputPanel extends ConsumerStatefulWidget {
@@ -16,6 +17,8 @@ class _OutputPanelState extends ConsumerState<OutputPanel>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _justCopied = false;
+  bool _wordWrap = true;
+  double _fontSize = 13.0;
 
   static const _tabs = ['JSON', 'Compact Prompt', 'Expanded Prompt'];
 
@@ -57,9 +60,22 @@ class _OutputPanelState extends ConsumerState<OutputPanel>
     });
   }
 
+  String _tokenLabel(GeneratedOutput? output) {
+    if (output == null) return '';
+    final tab = _tabController.index;
+    String content;
+    if (tab == 0) {
+      content = const JsonEncoder.withIndent('  ').convert(output.json);
+    } else if (tab == 1) {
+      content = output.compactPrompt;
+    } else {
+      content = output.expandedPrompt;
+    }
+    return TokenCounter.display(content);
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Sync external tab changes (e.g. from mode toggle)
     final selectedTab = ref.watch(selectedTabProvider);
     if (_tabController.index != selectedTab) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -73,7 +89,7 @@ class _OutputPanelState extends ConsumerState<OutputPanel>
       color: AppColors.background,
       child: Column(
         children: [
-          _buildTabBar(),
+          _buildTabBar(output),
           Expanded(
             child: output == null
                 ? _buildEmptyState()
@@ -91,41 +107,93 @@ class _OutputPanelState extends ConsumerState<OutputPanel>
     );
   }
 
-  Widget _buildTabBar() {
+  Widget _buildTabBar(GeneratedOutput? output) {
     return Container(
       color: AppColors.surfaceElevated,
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: TabBar(
-              controller: _tabController,
-              labelColor: AppColors.textPrimary,
-              unselectedLabelColor: AppColors.textSecondary,
-              labelStyle: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-              unselectedLabelStyle: const TextStyle(fontSize: 12),
-              indicator: const BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: AppColors.tabBorder, width: 2),
+          Row(
+            children: [
+              Expanded(
+                child: TabBar(
+                  controller: _tabController,
+                  labelColor: AppColors.textPrimary,
+                  unselectedLabelColor: AppColors.textSecondary,
+                  labelStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  unselectedLabelStyle: const TextStyle(fontSize: 12),
+                  indicator: const BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: AppColors.tabBorder, width: 2),
+                    ),
+                    color: AppColors.tabActive,
+                  ),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  dividerColor: AppColors.border,
+                  onTap: (_) => setState(() {}),
+                  tabs: _tabs.map((t) => Tab(height: 34, text: t)).toList(),
                 ),
-                color: AppColors.tabActive,
               ),
-              indicatorSize: TabBarIndicatorSize.tab,
-              dividerColor: AppColors.border,
-              tabs: _tabs
-                  .map((t) => Tab(height: 34, text: t))
-                  .toList(),
-            ),
-          ),
-          // Copy button
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: _CopyButton(
-              justCopied: _justCopied,
-              onPressed: _copyCurrentTab,
-            ),
+              // Controls row
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Token count
+                    if (output != null)
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: Text(
+                          _tokenLabel(output),
+                          key: ValueKey(_tokenLabel(output)),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textDisabled,
+                            fontFamily: 'Consolas',
+                          ),
+                        ),
+                      ),
+                    const SizedBox(width: 10),
+                    // Font size decrease
+                    _IconBtn(
+                      icon: Icons.text_decrease,
+                      tooltip: 'Decrease font size',
+                      onTap: () => setState(
+                          () => _fontSize = (_fontSize - 1).clamp(10, 20)),
+                    ),
+                    const SizedBox(width: 2),
+                    // Font size increase
+                    _IconBtn(
+                      icon: Icons.text_increase,
+                      tooltip: 'Increase font size',
+                      onTap: () => setState(
+                          () => _fontSize = (_fontSize + 1).clamp(10, 20)),
+                    ),
+                    const SizedBox(width: 4),
+                    // Word wrap toggle
+                    _IconBtn(
+                      icon: _wordWrap
+                          ? Icons.wrap_text
+                          : Icons.notes,
+                      tooltip:
+                          _wordWrap ? 'Disable word wrap' : 'Enable word wrap',
+                      active: _wordWrap,
+                      onTap: () => setState(() => _wordWrap = !_wordWrap),
+                    ),
+                    const SizedBox(width: 6),
+                    // Copy button
+                    _CopyButton(
+                      justCopied: _justCopied,
+                      onPressed: _copyCurrentTab,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -137,15 +205,12 @@ class _OutputPanelState extends ConsumerState<OutputPanel>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.auto_awesome_outlined,
+          const Icon(Icons.auto_awesome_outlined,
               size: 48, color: AppColors.textDisabled),
           const SizedBox(height: 16),
           const Text(
             'Press Generate to see output',
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
           ),
           const SizedBox(height: 6),
           const Text(
@@ -163,7 +228,11 @@ class _OutputPanelState extends ConsumerState<OutputPanel>
 
   Widget _buildJsonTab(GeneratedOutput output) {
     final json = const JsonEncoder.withIndent('  ').convert(output.json);
-    return _CodeView(content: json, language: 'JSON');
+    return _CodeView(
+        content: json,
+        language: 'JSON',
+        wordWrap: _wordWrap,
+        fontSize: _fontSize);
   }
 
   Widget _buildPromptTab(String content, String label) {
@@ -175,37 +244,112 @@ class _OutputPanelState extends ConsumerState<OutputPanel>
         ),
       );
     }
-    return _CodeView(content: content, language: label);
+    return _CodeView(
+        content: content,
+        language: label,
+        wordWrap: _wordWrap,
+        fontSize: _fontSize);
+  }
+}
+
+// ── Icon button ───────────────────────────────────────────────────────────────
+
+class _IconBtn extends StatefulWidget {
+  const _IconBtn({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+    this.active = false,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+  final bool active;
+
+  @override
+  State<_IconBtn> createState() => _IconBtnState();
+}
+
+class _IconBtnState extends State<_IconBtn> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: widget.tooltip,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 100),
+            width: 26,
+            height: 26,
+            decoration: BoxDecoration(
+              color: widget.active
+                  ? AppColors.accentMuted
+                  : _hovered
+                      ? AppColors.surfaceHover
+                      : Colors.transparent,
+              borderRadius: BorderRadius.circular(3),
+            ),
+            child: Icon(
+              widget.icon,
+              size: 14,
+              color:
+                  widget.active ? AppColors.accent : AppColors.textSecondary,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
 // ── Code view ─────────────────────────────────────────────────────────────────
 
 class _CodeView extends StatefulWidget {
-  const _CodeView({required this.content, required this.language});
+  const _CodeView({
+    required this.content,
+    required this.language,
+    required this.wordWrap,
+    required this.fontSize,
+  });
 
   final String content;
   final String language;
+  final bool wordWrap;
+  final double fontSize;
 
   @override
   State<_CodeView> createState() => _CodeViewState();
 }
 
 class _CodeViewState extends State<_CodeView> {
-  // canRequestFocus: false prevents SelectableText from stealing keyboard
-  // focus from the editor when output is first rendered.
   final FocusNode _focusNode = FocusNode(canRequestFocus: false);
   final ScrollController _scrollController = ScrollController();
+  final ScrollController _hScrollController = ScrollController();
 
   @override
   void dispose() {
     _focusNode.dispose();
     _scrollController.dispose();
+    _hScrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = TextStyle(
+      fontFamily: 'Consolas',
+      fontSize: widget.fontSize,
+      height: 1.6,
+      color: AppColors.textPrimary,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -214,21 +358,41 @@ class _CodeViewState extends State<_CodeView> {
           color: AppColors.surface,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           alignment: Alignment.centerLeft,
-          child: Text(widget.language.toUpperCase(), style: AppTextStyles.labelSmall),
+          child: Text(widget.language.toUpperCase(),
+              style: AppTextStyles.labelSmall),
         ),
         Expanded(
           child: Scrollbar(
             controller: _scrollController,
             thumbVisibility: true,
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              child: SelectableText(
-                widget.content,
-                style: AppTextStyles.outputText,
-                focusNode: _focusNode,
-              ),
-            ),
+            child: widget.wordWrap
+                ? SingleChildScrollView(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(16),
+                    child: SelectableText(
+                      widget.content,
+                      style: textStyle,
+                      focusNode: _focusNode,
+                    ),
+                  )
+                : SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Scrollbar(
+                      controller: _hScrollController,
+                      thumbVisibility: true,
+                      notificationPredicate: (n) => n.depth == 1,
+                      child: SingleChildScrollView(
+                        controller: _hScrollController,
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.all(16),
+                        child: SelectableText(
+                          widget.content,
+                          style: textStyle,
+                          focusNode: _focusNode,
+                        ),
+                      ),
+                    ),
+                  ),
           ),
         ),
       ],
@@ -256,8 +420,7 @@ class _CopyButton extends StatelessWidget {
                 Icon(Icons.check, size: 14, color: AppColors.success),
                 SizedBox(width: 4),
                 Text('Copied',
-                    style: TextStyle(
-                        fontSize: 12, color: AppColors.success)),
+                    style: TextStyle(fontSize: 12, color: AppColors.success)),
               ],
             )
           : InkWell(

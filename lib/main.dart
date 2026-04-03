@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 import 'providers/dsl_providers.dart';
+import 'screens/history_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/templates_screen.dart';
@@ -112,6 +113,7 @@ class _AppShell extends ConsumerWidget {
               children: const [
                 HomeScreen(),
                 TemplatesScreen(),
+                HistoryScreen(),
                 SettingsScreen(),
               ],
             ),

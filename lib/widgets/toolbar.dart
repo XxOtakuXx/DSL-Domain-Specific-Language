@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/dsl_providers.dart';
+import '../services/custom_template_service.dart';
 import '../services/file_service.dart';
 import '../theme/app_colors.dart';
 
@@ -29,6 +30,33 @@ class ToolbarWidget extends ConsumerWidget {
     final content = ref.read(dslInputProvider);
     final ok = await FileService().saveDslFile(content);
     _showStatus(ref, ok ? 'Saved' : 'Cancelled');
+  }
+
+  Future<void> _saveAsTemplate(WidgetRef ref, BuildContext context) async {
+    final dsl = ref.read(dslInputProvider).trim();
+    if (dsl.isEmpty) {
+      _showStatus(ref, 'Editor is empty');
+      return;
+    }
+    final result = await showDialog<_TemplateFormResult>(
+      context: context,
+      builder: (_) => _SaveTemplateDialog(dslPreview: dsl),
+    );
+    if (result == null) return;
+    final template = CustomTemplate(
+      id: 0,
+      title: result.title,
+      description: result.description,
+      category: result.category,
+      tags: result.tags,
+      dsl: dsl,
+      createdAt: DateTime.now(),
+    );
+    await CustomTemplateService().insert(template);
+    // Refresh provider
+    final all = await CustomTemplateService().loadAll();
+    ref.read(customTemplatesProvider.notifier).state = all;
+    _showStatus(ref, 'Template saved');
   }
 
   Future<void> _export(WidgetRef ref, BuildContext context) async {
@@ -169,6 +197,13 @@ class ToolbarWidget extends ConsumerWidget {
               icon: Icons.save_outlined,
               tooltip: 'Save as .dsl',
               onPressed: () => _save(ref),
+            ),
+            const SizedBox(width: 6),
+            _SecondaryButton(
+              label: 'Save Template',
+              icon: Icons.bookmark_add_outlined,
+              tooltip: 'Save current DSL as a custom template',
+              onPressed: () => _saveAsTemplate(ref, context),
             ),
             const SizedBox(width: 6),
           ],
@@ -492,6 +527,261 @@ class _MenuLabel extends StatelessWidget {
         Text(label,
             style: const TextStyle(
                 fontSize: 13, color: AppColors.textPrimary)),
+      ],
+    );
+  }
+}
+
+// ── Save Template dialog ──────────────────────────────────────────────────────
+
+class _TemplateFormResult {
+  const _TemplateFormResult({
+    required this.title,
+    required this.description,
+    required this.category,
+    required this.tags,
+  });
+  final String title;
+  final String description;
+  final String category;
+  final List<String> tags;
+}
+
+const _kCategories = [
+  'Software Dev', 'Mobile', 'API Design', 'Content & Writing',
+  'AI & Prompts', 'DevOps', 'Data & ML', 'Business',
+  'Education', 'Creative', 'Legal & HR', 'Research', 'My Templates',
+];
+
+class _SaveTemplateDialog extends StatefulWidget {
+  const _SaveTemplateDialog({required this.dslPreview});
+  final String dslPreview;
+
+  @override
+  State<_SaveTemplateDialog> createState() => _SaveTemplateDialogState();
+}
+
+class _SaveTemplateDialogState extends State<_SaveTemplateDialog> {
+  final _titleCtrl = TextEditingController();
+  final _descCtrl = TextEditingController();
+  final _tagsCtrl = TextEditingController();
+  String _category = 'My Templates';
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _titleCtrl.dispose();
+    _descCtrl.dispose();
+    _tagsCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: AppColors.surfaceElevated,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: SizedBox(
+        width: 460,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Save as Template',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.dslPreview.split('\n').take(3).join(' · '),
+                  style: const TextStyle(
+                    fontFamily: 'Consolas',
+                    fontSize: 11,
+                    color: AppColors.textDisabled,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 20),
+                _FormField(
+                  label: 'Title',
+                  controller: _titleCtrl,
+                  hint: 'e.g. My API Template',
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Required' : null,
+                ),
+                const SizedBox(height: 12),
+                _FormField(
+                  label: 'Description',
+                  controller: _descCtrl,
+                  hint: 'Short description of what this template does',
+                ),
+                const SizedBox(height: 12),
+                // Category dropdown
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Category',
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary)),
+                    const SizedBox(height: 6),
+                    Container(
+                      height: 34,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _category,
+                          dropdownColor: AppColors.surfaceElevated,
+                          style: const TextStyle(
+                              fontSize: 13, color: AppColors.textPrimary),
+                          isExpanded: true,
+                          items: _kCategories
+                              .map((c) => DropdownMenuItem(
+                                    value: c,
+                                    child: Text(c),
+                                  ))
+                              .toList(),
+                          onChanged: (v) =>
+                              setState(() => _category = v ?? _category),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _FormField(
+                  label: 'Tags (comma-separated)',
+                  controller: _tagsCtrl,
+                  hint: 'e.g. api, rest, node',
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel',
+                          style: TextStyle(color: AppColors.textSecondary)),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4)),
+                      ),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          final tags = _tagsCtrl.text
+                              .split(',')
+                              .map((t) => t.trim())
+                              .where((t) => t.isNotEmpty)
+                              .toList();
+                          Navigator.pop(
+                            context,
+                            _TemplateFormResult(
+                              title: _titleCtrl.text.trim(),
+                              description: _descCtrl.text.trim(),
+                              category: _category,
+                              tags: tags,
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Save Template',
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w600)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FormField extends StatelessWidget {
+  const _FormField({
+    required this.label,
+    required this.controller,
+    this.hint = '',
+    this.validator,
+  });
+  final String label;
+  final TextEditingController controller;
+  final String hint;
+  final String? Function(String?)? validator;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary)),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(
+                fontSize: 13, color: AppColors.textDisabled),
+            filled: true,
+            fillColor: AppColors.background,
+            isDense: true,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: AppColors.border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: AppColors.accent),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: AppColors.border),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: AppColors.error),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: AppColors.error),
+            ),
+          ),
+        ),
       ],
     );
   }
