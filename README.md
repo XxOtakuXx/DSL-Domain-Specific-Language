@@ -6,7 +6,7 @@ A native desktop app for Windows, macOS, and Linux that converts simple `KEY val
 
 Built with Flutter. No webview. No Electron. Real native performance.
 
-[![Release](https://img.shields.io/github/v/release/XxOtakuXx/DSL-Domain-Specific-Language?label=Latest%20Release)](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language/releases/latest)
+[![Release](https://img.shields.io/github/v/release/XxOtakuXx/DSL-Domain-Specific-Language?label=Latest%20Release)](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language/releases/tag)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41.6-02569B?logo=flutter)](https://flutter.dev)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)]()
