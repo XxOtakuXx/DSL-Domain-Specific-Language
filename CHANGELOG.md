@@ -5,6 +5,36 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [v1.4.0] — 2026-04-05
+
+### ✨ New Features
+
+- **162 built-in templates** — expanded from 83 to 162 templates across 19 categories. Seven new categories added:
+  - **E-Commerce** (6) — WooCommerce plugin, Shopify app, Magento 2 module, PrestaShop module, BigCommerce app, generic cart/checkout plugin
+  - **Artificial Intelligence** (8) — LLM chatbot, RAG pipeline, LLM fine-tuning (QLoRA), AI agent with tools, image classifier, NLP text classifier, ML training pipeline, learn AI/ML curriculum
+  - **Cybersecurity** (6) — penetration test report, threat model (STRIDE), SIEM detection rules, secure code review, incident response playbook, CTF challenge solver
+  - **Data Engineering** (5) — ETL pipeline, real-time streaming pipeline (Kafka/Flink), data warehouse design (dbt), data quality framework, data lakehouse (Delta Lake)
+  - **Cloud & Infrastructure** (5) — AWS infrastructure (Terraform), Kubernetes cluster setup, enterprise network architecture, serverless application, CI/CD pipeline
+  - **Information Technology** (6) — helpdesk SOP, IT asset management system, disaster recovery plan, Active Directory setup, IT monitoring & alerting, network audit
+  - **Security Systems** (8) — access control system, CCTV/surveillance, intrusion detection, SOC design, zero trust architecture, physical security audit, guard patrol system, learn security systems curriculum
+  - **Engineering** (6) — software architecture design, embedded systems firmware, mechanical system design, electrical circuit design, systems engineering plan, learn engineering curriculum
+  - **Reverse Engineering** (5) — binary analysis, network protocol RE, firmware extraction, mobile app RE, learn RE curriculum
+  - **Mathematics** (6) — proof assistant, linear algebra solver, calculus & analysis, applied optimization, statistics & probability, learn mathematics roadmap
+  - **Science** (6) — experiment design, physics simulation, chemistry lab protocol, applied physics, biology research framework, learn science roadmap
+  - **Cryptography & Blockchain** (11) — cryptography fundamentals, TLS & PKI, zero-knowledge proofs, smart contracts (Solidity), DeFi protocol, NFT collection, custom blockchain/L2, crypto trading bot, HD wallet, learn cryptography, learn blockchain dev
+
+### 🔧 Improvements
+
+- Template cards for all new categories now render with distinct accent colors.
+- Save Template dialog category dropdown includes all 19 categories + My Templates.
+
+### 🐛 Bug Fixes
+
+- **Bug:** Template cards for new categories were falling back to a generic accent color — `_categoryColors` map now covers all 19 built-in categories.
+- **Bug:** Save Template dialog was missing all new categories — `_kCategories` list updated to match.
+
+---
+
 ## [v1.3.0] — 2026-04-04
 
 ### ✨ New Features

@@ -45,6 +45,18 @@ const List<TemplateCategory> kTemplateCategories = [
   TemplateCategory(name: 'Creative', icon: Icons.palette),
   TemplateCategory(name: 'Legal & HR', icon: Icons.gavel),
   TemplateCategory(name: 'Research', icon: Icons.science),
+  TemplateCategory(name: 'E-Commerce', icon: Icons.shopping_cart),
+  TemplateCategory(name: 'Artificial Intelligence', icon: Icons.psychology),
+  TemplateCategory(name: 'Cybersecurity', icon: Icons.security),
+  TemplateCategory(name: 'Data Engineering', icon: Icons.storage),
+  TemplateCategory(name: 'Cloud & Infrastructure', icon: Icons.cloud),
+  TemplateCategory(name: 'Information Technology', icon: Icons.computer),
+  TemplateCategory(name: 'Security Systems', icon: Icons.shield),
+  TemplateCategory(name: 'Engineering', icon: Icons.engineering),
+  TemplateCategory(name: 'Reverse Engineering', icon: Icons.build_circle),
+  TemplateCategory(name: 'Mathematics', icon: Icons.functions),
+  TemplateCategory(name: 'Science', icon: Icons.biotech),
+  TemplateCategory(name: 'Cryptography & Blockchain', icon: Icons.currency_bitcoin),
 ];
 
 // ── Template library ──────────────────────────────────────────────────────────
@@ -1290,5 +1302,1317 @@ HYPOTHESES 3
 TESTS t-test, ANOVA, regression
 FEATURES power-analysis, effect-size, visualizations
 OUTPUT analysis code and report template''',
+  ),
+
+  // ── E-Commerce ────────────────────────────────────────────────────────────
+
+  TemplateItem(
+    id: 'ec_woocommerce_plugin',
+    title: 'WooCommerce Plugin',
+    description: 'Custom WooCommerce plugin with hooks, settings page, and REST endpoint',
+    category: 'E-Commerce',
+    tags: ['woocommerce', 'wordpress', 'plugin', 'php', 'ecommerce'],
+    dsl: '''CREATE plugin
+TYPE woocommerce
+STACK PHP 8.1, WordPress 6.x, WooCommerce 8.x
+FEATURES custom-product-field, checkout-hook, order-meta, settings-page, REST-endpoint
+HOOKS woocommerce_checkout_process, woocommerce_order_status_changed, woocommerce_product_options_general_product_data
+SETTINGS api-key, enable-toggle, select-dropdown
+AUTH wordpress-nonce
+OUTPUT full plugin with readme.txt and uninstall.php''',
+  ),
+
+  TemplateItem(
+    id: 'ec_shopify_app',
+    title: 'Shopify App',
+    description: 'Shopify embedded app with Admin API integration and OAuth flow',
+    category: 'E-Commerce',
+    tags: ['shopify', 'app', 'nodejs', 'oauth', 'admin-api', 'ecommerce'],
+    dsl: '''CREATE app
+TYPE shopify-embedded
+STACK Node.js, Shopify CLI 3.x, Polaris, Remix
+FEATURES oauth-flow, session-storage, admin-api, webhooks, app-proxy
+SCOPES read_products, write_orders, read_customers
+WEBHOOKS orders/create, products/update, app/uninstalled
+DATABASE SQLite
+OUTPUT full app with shopify.app.toml and deploy config''',
+  ),
+
+  TemplateItem(
+    id: 'ec_magento_module',
+    title: 'Magento 2 Module',
+    description: 'Magento 2 module with custom attribute, observer, and admin grid',
+    category: 'E-Commerce',
+    tags: ['magento', 'magento2', 'module', 'php', 'ecommerce'],
+    dsl: '''CREATE module
+TYPE magento2
+STACK PHP 8.2, Magento 2.4.x
+FEATURES custom-attribute, observer, admin-grid, REST-api, cron-job, email-template
+OBSERVERS sales_order_place_after, catalog_product_save_after
+ADMIN grid with filters and mass-actions
+DI preferences, plugins, virtual-types
+OUTPUT module with registration.php, composer.json, and install schema''',
+  ),
+
+  TemplateItem(
+    id: 'ec_prestashop_module',
+    title: 'PrestaShop Module',
+    description: 'PrestaShop module with front controller, hooks, and back-office config',
+    category: 'E-Commerce',
+    tags: ['prestashop', 'module', 'php', 'ecommerce'],
+    dsl: '''CREATE module
+TYPE prestashop
+STACK PHP 8.1, PrestaShop 8.x
+FEATURES front-controller, hooks, back-office-config, override, display-block
+HOOKS displayHeader, actionOrderStatusUpdate, displayProductAdditionalInfo
+CONFIG form with text, select, and checkbox fields
+OUTPUT module with index.php, logo.png placeholder, and install SQL''',
+  ),
+
+  TemplateItem(
+    id: 'ec_bigcommerce_app',
+    title: 'BigCommerce App',
+    description: 'BigCommerce single-click app with Management API and webhooks',
+    category: 'E-Commerce',
+    tags: ['bigcommerce', 'app', 'nodejs', 'api', 'ecommerce'],
+    dsl: '''CREATE app
+TYPE bigcommerce-single-click
+STACK Node.js, Express, BigCommerce Management API v2/v3
+FEATURES oauth-install-flow, webhooks, storefront-script, metafields, widget-template
+SCOPES store_v2_orders, store_v2_products, store_content
+WEBHOOKS store/order/created, store/product/updated
+OUTPUT full app with bigcommerce.yaml and deploy instructions''',
+  ),
+
+  TemplateItem(
+    id: 'ec_generic_cart_plugin',
+    title: 'Generic Cart & Checkout Plugin',
+    description: 'Platform-agnostic e-commerce plugin spec for custom cart logic and payment gateway',
+    category: 'E-Commerce',
+    tags: ['cart', 'checkout', 'payment', 'gateway', 'plugin', 'ecommerce'],
+    dsl: '''CREATE plugin
+TYPE ecommerce-cart
+PLATFORM specify-target-platform
+STACK specify-language-and-framework
+FEATURES add-to-cart, cart-totals, discount-codes, tax-calculation, payment-gateway, order-confirmation
+PAYMENT stripe, paypal, manual
+HOOKS before-checkout, after-order-placed, on-payment-failure
+OUTPUT plugin scaffold with configuration, hooks, and payment adapter pattern''',
+  ),
+
+  // ── Artificial Intelligence ───────────────────────────────────────────────
+
+  TemplateItem(
+    id: 'ai_build_llm_chatbot',
+    title: 'LLM Chatbot App',
+    description: 'Build a production chatbot powered by an LLM with memory and streaming',
+    category: 'Artificial Intelligence',
+    tags: ['llm', 'chatbot', 'openai', 'langchain', 'streaming', 'memory'],
+    dsl: '''CREATE app
+TYPE llm-chatbot
+STACK Python 3.11, LangChain, OpenAI GPT-4o, FastAPI
+FEATURES streaming-responses, conversation-memory, system-prompt, multi-turn, token-limit-guard
+MEMORY type: sliding-window, max-tokens: 8000
+DEPLOYMENT docker, uvicorn
+OUTPUT full app with chat endpoint, memory manager, and Dockerfile''',
+  ),
+
+  TemplateItem(
+    id: 'ai_rag_pipeline',
+    title: 'RAG Pipeline',
+    description: 'Retrieval-Augmented Generation pipeline with vector store and document ingestion',
+    category: 'Artificial Intelligence',
+    tags: ['rag', 'vector-store', 'embeddings', 'retrieval', 'llm', 'langchain'],
+    dsl: '''CREATE pipeline
+TYPE RAG
+STACK Python 3.11, LangChain, OpenAI, ChromaDB
+FEATURES document-ingestion, chunking, embedding, vector-search, answer-generation, source-citation
+CHUNKING strategy: recursive, chunk-size: 512, overlap: 64
+EMBEDDING model: text-embedding-3-small
+RETRIEVER top-k: 5, similarity-threshold: 0.75
+OUTPUT full pipeline with ingest script, retriever, and query API''',
+  ),
+
+  TemplateItem(
+    id: 'ai_fine_tuning',
+    title: 'LLM Fine-Tuning',
+    description: 'Fine-tune an open-source LLM on a custom dataset using LoRA/QLoRA',
+    category: 'Artificial Intelligence',
+    tags: ['fine-tuning', 'lora', 'qlora', 'transformers', 'huggingface', 'llm'],
+    dsl: '''CREATE training-job
+TYPE llm-fine-tuning
+STACK Python 3.11, HuggingFace Transformers, PEFT, bitsandbytes, Accelerate
+BASE-MODEL mistralai/Mistral-7B-Instruct-v0.2
+METHOD QLoRA
+DATASET format: instruction-response JSONL
+HYPERPARAMS epochs: 3, lr: 2e-4, batch-size: 4, gradient-accumulation: 8
+HARDWARE single-GPU A100 or consumer RTX 3090
+OUTPUT training script, dataset formatter, and model export to GGUF''',
+  ),
+
+  TemplateItem(
+    id: 'ai_agent_framework',
+    title: 'AI Agent with Tools',
+    description: 'Autonomous AI agent with tool use, planning loop, and memory',
+    category: 'Artificial Intelligence',
+    tags: ['agent', 'tool-use', 'planning', 'autonomous', 'langchain', 'llm'],
+    dsl: '''CREATE agent
+TYPE autonomous-tool-use
+STACK Python 3.11, LangChain Agents, OpenAI GPT-4o, Tavily Search
+TOOLS web-search, code-interpreter, file-read, calculator, API-caller
+PLANNING ReAct loop
+MEMORY short-term: buffer, long-term: vector-store
+SAFETY max-iterations: 10, human-in-the-loop: optional
+OUTPUT agent with tool registry, planning loop, and CLI runner''',
+  ),
+
+  TemplateItem(
+    id: 'ai_image_classifier',
+    title: 'Image Classifier',
+    description: 'Train a CNN image classifier with transfer learning and export for deployment',
+    category: 'Artificial Intelligence',
+    tags: ['cnn', 'image-classification', 'pytorch', 'transfer-learning', 'computer-vision'],
+    dsl: '''CREATE model
+TYPE image-classifier
+STACK Python 3.11, PyTorch, torchvision, ResNet50
+METHOD transfer-learning
+DATASET custom, format: ImageFolder, split: 80/10/10
+FEATURES data-augmentation, early-stopping, confusion-matrix, grad-cam
+HYPERPARAMS epochs: 20, lr: 1e-4, batch-size: 32, freeze-backbone: first-5-epochs
+EXPORT ONNX, TorchScript
+OUTPUT training script, evaluation report, and inference server''',
+  ),
+
+  TemplateItem(
+    id: 'ai_nlp_text_classifier',
+    title: 'NLP Text Classifier',
+    description: 'Fine-tune BERT for text classification (sentiment, intent, topic)',
+    category: 'Artificial Intelligence',
+    tags: ['nlp', 'bert', 'text-classification', 'sentiment', 'huggingface', 'transformers'],
+    dsl: '''CREATE model
+TYPE text-classifier
+STACK Python 3.11, HuggingFace Transformers, PyTorch
+BASE-MODEL bert-base-uncased
+TASK sentiment-analysis
+CLASSES positive, negative, neutral
+DATASET CSV with text and label columns
+FEATURES tokenization, class-weights, evaluation-metrics, confusion-matrix
+HYPERPARAMS epochs: 4, lr: 2e-5, max-length: 256, batch-size: 16
+OUTPUT fine-tuned model, inference API, and evaluation notebook''',
+  ),
+
+  TemplateItem(
+    id: 'ai_ml_pipeline',
+    title: 'ML Training Pipeline',
+    description: 'End-to-end ML pipeline with feature engineering, training, and model registry',
+    category: 'Artificial Intelligence',
+    tags: ['mlops', 'pipeline', 'sklearn', 'mlflow', 'feature-engineering', 'training'],
+    dsl: '''CREATE pipeline
+TYPE ml-training
+STACK Python 3.11, scikit-learn, MLflow, pandas, optuna
+STAGES data-ingestion, feature-engineering, model-training, hyperparameter-tuning, evaluation, registration
+MODELS random-forest, xgboost, logistic-regression
+TUNING optuna, n-trials: 100
+TRACKING MLflow experiments and artifacts
+FEATURES cross-validation, feature-importance, SHAP-explainability
+OUTPUT pipeline with config YAML, MLflow setup, and deployment-ready model''',
+  ),
+
+  TemplateItem(
+    id: 'ai_learn_from_scratch',
+    title: 'Learn AI / ML from Scratch',
+    description: 'Structured AI learning curriculum with projects, resources, and milestones',
+    category: 'Artificial Intelligence',
+    tags: ['learning', 'curriculum', 'beginner', 'roadmap', 'ml', 'ai'],
+    dsl: '''CREATE curriculum
+TYPE ai-ml-learning-path
+LEVEL beginner
+GOAL build and deploy ML models
+DURATION 12 weeks
+TOPICS Python basics, linear-algebra, statistics, supervised-learning, neural-networks, deep-learning, NLP, computer-vision, MLOps
+PROJECTS iris-classifier, sentiment-analyzer, image-classifier, fine-tuned-LLM, RAG-chatbot
+RESOURCES fast.ai, Andrej Karpathy tutorials, HuggingFace course, Stanford CS231n
+OUTPUT week-by-week study plan with project checkpoints and resource links''',
+  ),
+
+  // ── Cybersecurity ─────────────────────────────────────────────────────────
+
+  TemplateItem(
+    id: 'sec_pentest_report',
+    title: 'Penetration Test Report',
+    description: 'Structured pentest report with findings, CVSS scores, and remediation steps',
+    category: 'Cybersecurity',
+    tags: ['pentest', 'report', 'vulnerability', 'cvss', 'remediation'],
+    dsl: '''CREATE report
+TYPE penetration-test
+SCOPE web-application
+METHODOLOGY OWASP Testing Guide, PTES
+SECTIONS executive-summary, scope, methodology, findings, risk-matrix, remediation
+FINDINGS format: title, severity, CVSS-score, description, proof-of-concept, remediation
+SEVERITY critical, high, medium, low, informational
+OUTPUT professional pentest report template in markdown''',
+  ),
+
+  TemplateItem(
+    id: 'sec_threat_model',
+    title: 'Threat Model',
+    description: 'STRIDE threat model for a system with data flow diagrams and mitigations',
+    category: 'Cybersecurity',
+    tags: ['threat-modeling', 'stride', 'security', 'dfd', 'architecture'],
+    dsl: '''CREATE document
+TYPE threat-model
+FRAMEWORK STRIDE
+SYSTEM web-application with API and database
+COMPONENTS frontend, API-gateway, backend-service, database, auth-service, CDN
+THREATS spoofing, tampering, repudiation, information-disclosure, denial-of-service, elevation-of-privilege
+MITIGATIONS per-threat with priority and owner
+OUTPUT threat model with data flow diagram, threat table, and mitigation plan''',
+  ),
+
+  TemplateItem(
+    id: 'sec_siem_detection',
+    title: 'SIEM Detection Rule',
+    description: 'Write SIEM detection rules for common attack patterns with alert logic',
+    category: 'Cybersecurity',
+    tags: ['siem', 'detection', 'splunk', 'elastic', 'alert', 'threat-hunting'],
+    dsl: '''CREATE rule
+TYPE siem-detection
+PLATFORM Splunk / Elastic SIEM
+ATTACK-PATTERNS brute-force, lateral-movement, privilege-escalation, data-exfiltration, C2-beacon
+MITRE-ATT&CK yes
+FIELDS source-ip, dest-ip, user, event-id, timestamp, action
+THRESHOLDS configurable per rule
+OUTPUT detection rules with SPL/KQL, MITRE mapping, and triage runbook''',
+  ),
+
+  TemplateItem(
+    id: 'sec_secure_code_review',
+    title: 'Secure Code Review',
+    description: 'Security-focused code review checklist covering OWASP Top 10 and common CVEs',
+    category: 'Cybersecurity',
+    tags: ['code-review', 'owasp', 'security', 'sast', 'vulnerabilities'],
+    dsl: '''CREATE checklist
+TYPE secure-code-review
+LANGUAGE Python / JavaScript / Go
+STANDARDS OWASP Top 10, CWE Top 25
+CHECKS injection, broken-auth, XSS, IDOR, security-misconfiguration, XXE, deserialization, logging, crypto
+TOOLS semgrep, bandit, eslint-security
+SEVERITY critical, high, medium, low
+OUTPUT review checklist with code examples, bad-vs-good patterns, and fix snippets''',
+  ),
+
+  TemplateItem(
+    id: 'sec_incident_response',
+    title: 'Incident Response Playbook',
+    description: 'IR playbook for a specific threat scenario with triage, containment, and recovery steps',
+    category: 'Cybersecurity',
+    tags: ['incident-response', 'playbook', 'forensics', 'containment', 'soc'],
+    dsl: '''CREATE playbook
+TYPE incident-response
+SCENARIO ransomware-attack
+PHASES detection, triage, containment, eradication, recovery, post-incident
+ROLES SOC-analyst, IR-lead, system-owner, legal, communications
+TOOLS EDR, SIEM, forensic-image, network-capture
+ESCALATION matrix with SLA timelines
+OUTPUT step-by-step IR playbook with checklists, decision trees, and communication templates''',
+  ),
+
+  TemplateItem(
+    id: 'sec_ctf_challenge',
+    title: 'CTF Challenge Solver',
+    description: 'Structured approach to solving CTF challenges across common categories',
+    category: 'Cybersecurity',
+    tags: ['ctf', 'capture-the-flag', 'hacking', 'learning', 'challenges'],
+    dsl: '''CREATE guide
+TYPE CTF-challenge-solver
+CATEGORIES web, crypto, reverse-engineering, pwn, forensics, OSINT, steganography
+APPROACH reconnaissance, enumeration, exploitation, post-exploitation
+TOOLS burpsuite, ghidra, gdb, pwntools, binwalk, cyberchef, nmap
+SKILL-LEVEL beginner-to-intermediate
+OUTPUT methodology guide with tool commands, common patterns, and flag extraction techniques''',
+  ),
+
+  // ── Data Engineering ──────────────────────────────────────────────────────
+
+  TemplateItem(
+    id: 'de_etl_pipeline',
+    title: 'ETL Pipeline',
+    description: 'Extract, Transform, Load pipeline with scheduling, logging, and error handling',
+    category: 'Data Engineering',
+    tags: ['etl', 'pipeline', 'airflow', 'python', 'data', 'scheduling'],
+    dsl: '''CREATE pipeline
+TYPE ETL
+STACK Python 3.11, Apache Airflow, pandas, SQLAlchemy
+SOURCE PostgreSQL / REST API / S3
+TARGET data-warehouse (Snowflake / BigQuery)
+FEATURES incremental-load, schema-validation, error-retry, dead-letter-queue, data-lineage
+SCHEDULING daily at 02:00 UTC
+MONITORING Airflow alerts, Slack notifications
+OUTPUT DAG definition, transformers, schema contracts, and monitoring setup''',
+  ),
+
+  TemplateItem(
+    id: 'de_streaming_pipeline',
+    title: 'Real-Time Streaming Pipeline',
+    description: 'Event-driven streaming pipeline with Kafka and Flink or Spark Streaming',
+    category: 'Data Engineering',
+    tags: ['streaming', 'kafka', 'flink', 'spark', 'real-time', 'events'],
+    dsl: '''CREATE pipeline
+TYPE streaming
+STACK Python / Java, Apache Kafka, Apache Flink, Redis
+SOURCE Kafka topic (click events, transactions, IoT)
+FEATURES windowing, deduplication, late-arrival-handling, stateful-aggregation, watermarks
+SINK data-warehouse, Elasticsearch, Redis cache
+THROUGHPUT 100k events/sec
+MONITORING Kafka lag, Flink job metrics, Grafana
+OUTPUT stream processor, Kafka producer/consumer, and deployment config''',
+  ),
+
+  TemplateItem(
+    id: 'de_data_warehouse',
+    title: 'Data Warehouse Design',
+    description: 'Star schema data warehouse with dbt models, dimensions, and fact tables',
+    category: 'Data Engineering',
+    tags: ['data-warehouse', 'dbt', 'snowflake', 'bigquery', 'star-schema', 'analytics'],
+    dsl: '''CREATE warehouse
+TYPE star-schema
+STACK dbt, Snowflake / BigQuery, Fivetran
+FACTS orders, sessions, transactions
+DIMENSIONS customers, products, dates, channels, geography
+FEATURES slowly-changing-dimensions, surrogate-keys, incremental-models, data-tests
+DOCUMENTATION dbt docs with column descriptions
+OUTPUT dbt project with models, sources, macros, and CI test suite''',
+  ),
+
+  TemplateItem(
+    id: 'de_data_quality',
+    title: 'Data Quality Framework',
+    description: 'Automated data quality checks with alerting and a data observability dashboard',
+    category: 'Data Engineering',
+    tags: ['data-quality', 'great-expectations', 'observability', 'validation', 'monitoring'],
+    dsl: '''CREATE framework
+TYPE data-quality
+STACK Python, Great Expectations, dbt tests, Monte Carlo / Soda
+CHECKS schema-drift, null-rate, row-count, distribution-shift, referential-integrity, freshness
+DATA-SOURCES PostgreSQL, Snowflake, S3 parquet
+ALERTING PagerDuty, Slack, email
+DASHBOARD quality-score per dataset, trend over time
+OUTPUT expectation suites, validation pipeline, alert config, and observability dashboard''',
+  ),
+
+  TemplateItem(
+    id: 'de_lakehouse',
+    title: 'Data Lakehouse',
+    description: 'Modern lakehouse architecture with Delta Lake, catalog, and query engine',
+    category: 'Data Engineering',
+    tags: ['lakehouse', 'delta-lake', 'spark', 'unity-catalog', 'iceberg', 'databricks'],
+    dsl: '''CREATE architecture
+TYPE lakehouse
+STACK Apache Spark, Delta Lake / Apache Iceberg, Databricks / AWS Glue, Unity Catalog
+ZONES bronze (raw), silver (cleaned), gold (aggregated)
+FEATURES ACID-transactions, time-travel, schema-evolution, partition-pruning, Z-ordering
+COMPUTE Databricks clusters / EMR Serverless
+GOVERNANCE column-level-lineage, PII-tagging, access-control
+OUTPUT lakehouse design with medallion architecture, table definitions, and Spark jobs''',
+  ),
+
+  // ── Cloud & Infrastructure ────────────────────────────────────────────────
+
+  TemplateItem(
+    id: 'cloud_aws_infra',
+    title: 'AWS Infrastructure (Terraform)',
+    description: 'Production AWS infrastructure with VPC, ECS, RDS, and ALB via Terraform',
+    category: 'Cloud & Infrastructure',
+    tags: ['aws', 'terraform', 'vpc', 'ecs', 'rds', 'iac'],
+    dsl: '''CREATE infrastructure
+TYPE aws-production
+TOOL Terraform
+COMPONENTS VPC, public/private subnets, NAT gateway, ALB, ECS Fargate, RDS PostgreSQL, ElastiCache, S3, CloudFront, WAF
+FEATURES multi-AZ, auto-scaling, secrets-manager, CloudWatch alarms, cost-tags
+NETWORKING CIDR 10.0.0.0/16, 3 AZs
+SECURITY security-groups, IAM roles, KMS encryption, VPC flow logs
+OUTPUT Terraform modules with variables, outputs, and remote state config''',
+  ),
+
+  TemplateItem(
+    id: 'cloud_kubernetes_cluster',
+    title: 'Kubernetes Cluster Setup',
+    description: 'Production Kubernetes cluster with namespaces, RBAC, ingress, and monitoring',
+    category: 'Cloud & Infrastructure',
+    tags: ['kubernetes', 'k8s', 'helm', 'ingress', 'rbac', 'monitoring'],
+    dsl: '''CREATE cluster
+TYPE kubernetes-production
+PLATFORM EKS / GKE / AKS
+TOOL Helm, kubectl, Terraform
+COMPONENTS namespaces, RBAC, ingress-nginx, cert-manager, cluster-autoscaler, HPA, PodDisruptionBudgets
+MONITORING Prometheus, Grafana, Alertmanager, Loki
+SECURITY network-policies, pod-security-standards, OPA Gatekeeper, secrets-store-csi
+OUTPUT cluster manifests, Helm values, monitoring stack, and runbook''',
+  ),
+
+  TemplateItem(
+    id: 'cloud_network_design',
+    title: 'Network Architecture Design',
+    description: 'Enterprise network design with segmentation, firewall rules, and VPN',
+    category: 'Cloud & Infrastructure',
+    tags: ['network', 'architecture', 'firewall', 'vpn', 'vlan', 'zero-trust'],
+    dsl: '''CREATE architecture
+TYPE enterprise-network
+TOPOLOGY hub-and-spoke
+SEGMENTS DMZ, corporate-LAN, server-VLAN, guest-VLAN, OT-network
+COMPONENTS core-switch, edge-firewall, IDS/IPS, load-balancer, VPN-gateway, DNS, DHCP
+SECURITY zero-trust, micro-segmentation, east-west-inspection, MFA-VPN
+REDUNDANCY active-passive failover, dual ISP, BGP
+OUTPUT network diagram, IP addressing plan, firewall ruleset, and configuration templates''',
+  ),
+
+  TemplateItem(
+    id: 'cloud_serverless_app',
+    title: 'Serverless Application',
+    description: 'Event-driven serverless app with Lambda, API Gateway, DynamoDB, and SQS',
+    category: 'Cloud & Infrastructure',
+    tags: ['serverless', 'lambda', 'aws', 'api-gateway', 'dynamodb', 'sqs'],
+    dsl: '''CREATE app
+TYPE serverless
+STACK AWS Lambda, API Gateway, DynamoDB, SQS, S3, EventBridge
+RUNTIME Python 3.12 / Node.js 20
+TOOL AWS SAM / Serverless Framework
+FEATURES REST-api, async-processing, event-driven, dead-letter-queue, X-Ray-tracing
+TRIGGERS HTTP, S3 events, SQS, EventBridge schedule
+SECURITY IAM least-privilege, API key, Lambda authorizer
+OUTPUT SAM template, Lambda functions, local dev setup, and CI/CD pipeline''',
+  ),
+
+  TemplateItem(
+    id: 'cloud_cicd_pipeline',
+    title: 'CI/CD Pipeline',
+    description: 'Full CI/CD pipeline with build, test, security scan, and multi-environment deploy',
+    category: 'Cloud & Infrastructure',
+    tags: ['cicd', 'github-actions', 'pipeline', 'deploy', 'docker', 'devops'],
+    dsl: '''CREATE pipeline
+TYPE CI/CD
+PLATFORM GitHub Actions / GitLab CI
+STAGES lint, unit-test, build, security-scan, integration-test, deploy-staging, smoke-test, deploy-production
+TOOLS Docker, Trivy (image scan), SAST, Terraform plan
+ENVIRONMENTS dev, staging, production
+DEPLOY strategy: blue-green / canary
+NOTIFICATIONS Slack on failure, PagerDuty on prod incident
+OUTPUT workflow YAML, Dockerfiles, environment configs, and rollback procedure''',
+  ),
+
+  // ── Information Technology ────────────────────────────────────────────────
+
+  TemplateItem(
+    id: 'it_helpdesk_sop',
+    title: 'Helpdesk SOP',
+    description: 'Standard operating procedure for a common IT helpdesk issue with triage steps',
+    category: 'Information Technology',
+    tags: ['helpdesk', 'sop', 'it-support', 'triage', 'documentation'],
+    dsl: '''CREATE document
+TYPE SOP
+ISSUE password-reset / VPN-connectivity / hardware-failure
+AUDIENCE tier-1 helpdesk technician
+SECTIONS overview, prerequisites, step-by-step-procedure, escalation-criteria, rollback
+TOOLS Active Directory, ticketing-system, remote-desktop
+ESTIMATED-TIME 10 minutes
+OUTPUT SOP with numbered steps, screenshots placeholders, and escalation matrix''',
+  ),
+
+  TemplateItem(
+    id: 'it_asset_management',
+    title: 'IT Asset Management System',
+    description: 'Asset tracking system for hardware, software licenses, and lifecycle management',
+    category: 'Information Technology',
+    tags: ['asset-management', 'itam', 'inventory', 'lifecycle', 'cmdb'],
+    dsl: '''CREATE system
+TYPE IT-asset-management
+STACK Python / Node.js, PostgreSQL, REST API
+ASSETS hardware (laptops, servers, phones), software-licenses, network-devices
+FEATURES asset-registry, assignment-tracking, lifecycle-alerts, license-compliance, depreciation, audit-log
+INTEGRATIONS Active Directory, ticketing-system, procurement
+REPORTS expiring-licenses, end-of-life-hardware, cost-by-department
+OUTPUT full system with API, admin dashboard, and import/export templates''',
+  ),
+
+  TemplateItem(
+    id: 'it_disaster_recovery',
+    title: 'Disaster Recovery Plan',
+    description: 'DR plan with RTO/RPO targets, runbooks, and failover procedures',
+    category: 'Information Technology',
+    tags: ['disaster-recovery', 'drp', 'rto', 'rpo', 'business-continuity', 'backup'],
+    dsl: '''CREATE plan
+TYPE disaster-recovery
+SCOPE entire-IT-infrastructure
+RTO 4 hours
+RPO 1 hour
+COMPONENTS backup-strategy, failover-sites, communication-plan, vendor-contacts, recovery-runbooks
+BACKUP schedule: hourly snapshots, daily full, offsite-replication
+TESTING quarterly DR drill
+PRIORITIES tier-1: payment-system, tier-2: email, tier-3: internal-tools
+OUTPUT DR plan with runbooks, contact list, recovery checklists, and test report template''',
+  ),
+
+  TemplateItem(
+    id: 'it_active_directory',
+    title: 'Active Directory Setup',
+    description: 'AD domain design with OUs, GPOs, security groups, and hardening',
+    category: 'Information Technology',
+    tags: ['active-directory', 'windows-server', 'gpo', 'ldap', 'identity', 'sysadmin'],
+    dsl: '''CREATE infrastructure
+TYPE active-directory
+DOMAIN company.local
+FOREST-LEVEL Windows Server 2022
+STRUCTURE OUs: Departments, Servers, Workstations, Service-Accounts
+GPOs password-policy, screen-lock, software-restriction, audit-policy, LAPS
+SECURITY tiered-admin-model, PAW, just-in-time-access, AD-recycle-bin
+FEATURES DHCP, DNS, PKI, ADFS
+OUTPUT AD design document, GPO settings, PowerShell setup scripts, and hardening checklist''',
+  ),
+
+  TemplateItem(
+    id: 'it_monitoring_setup',
+    title: 'IT Monitoring & Alerting',
+    description: 'Infrastructure monitoring stack with dashboards, alerts, and on-call runbooks',
+    category: 'Information Technology',
+    tags: ['monitoring', 'alerting', 'prometheus', 'grafana', 'nagios', 'observability'],
+    dsl: '''CREATE system
+TYPE monitoring
+STACK Prometheus, Grafana, Alertmanager, Loki, node-exporter
+TARGETS servers, network-devices, databases, applications, URLs
+METRICS CPU, memory, disk, network-latency, service-uptime, error-rate
+ALERTS critical: pagerduty, warning: slack, info: email
+DASHBOARDS infrastructure-overview, application-health, capacity-planning
+ON-CALL rotation with escalation policy
+OUTPUT monitoring config, Grafana dashboards, alert rules, and on-call runbook''',
+  ),
+
+  TemplateItem(
+    id: 'it_network_audit',
+    title: 'Network Audit & Inventory',
+    description: 'Network discovery, device inventory, and configuration audit report',
+    category: 'Information Technology',
+    tags: ['network-audit', 'inventory', 'nmap', 'snmp', 'compliance', 'sysadmin'],
+    dsl: '''CREATE report
+TYPE network-audit
+SCOPE LAN, WAN, wireless, cloud-connectivity
+TOOLS nmap, SNMP, Netmiko, Nessus
+DISCOVERY IP-range scan, device fingerprinting, port enumeration
+INVENTORY routers, switches, firewalls, APs, servers, endpoints
+CHECKS firmware-versions, open-ports, default-credentials, unused-ports, VLAN-config
+OUTPUT audit report with device inventory CSV, risk findings, and remediation plan''',
+  ),
+
+  // ── Security Systems ──────────────────────────────────────────────────────
+
+  TemplateItem(
+    id: 'ss_access_control_system',
+    title: 'Access Control System',
+    description: 'Design a physical access control system with card readers, zones, and audit logs',
+    category: 'Security Systems',
+    tags: ['access-control', 'physical-security', 'rfid', 'acl', 'audit-log'],
+    dsl: '''CREATE system
+TYPE physical-access-control
+HARDWARE RFID card readers, electric strikes, door controllers, biometric scanners
+ZONES lobby, office-floor, server-room, executive-suite, restricted-lab
+FEATURES role-based-access, time-schedules, anti-passback, alarm-triggers, audit-log, remote-unlock
+INTEGRATIONS HR-system (auto-provision on hire/offboard), SIEM, video-surveillance
+ALERTS tailgating, forced-door, access-denied-threshold, after-hours-entry
+OUTPUT system design, zone map, access matrix, hardware BOM, and integration spec''',
+  ),
+
+  TemplateItem(
+    id: 'ss_cctv_surveillance',
+    title: 'CCTV / Surveillance System',
+    description: 'IP camera network design with NVR, storage, and AI motion analytics',
+    category: 'Security Systems',
+    tags: ['cctv', 'surveillance', 'ip-camera', 'nvr', 'video-analytics'],
+    dsl: '''CREATE system
+TYPE video-surveillance
+CAMERAS IP PTZ, fixed dome, fisheye, license-plate-recognition, thermal
+COVERAGE entrances, parking, perimeter, server-room, reception, stairwells
+NVR centralized recording, 30-day retention, RAID-6 storage
+FEATURES motion-detection, AI-analytics, facial-recognition, license-plate-capture, remote-viewing, alerts
+NETWORKING dedicated VLAN, PoE switches, fiber backbone
+STORAGE calculation: camera-count x bitrate x retention-days
+OUTPUT camera placement plan, NVR config, network diagram, storage sizing, and monitoring dashboard''',
+  ),
+
+  TemplateItem(
+    id: 'ss_intrusion_detection',
+    title: 'Intrusion Detection System',
+    description: 'Physical IDS with sensors, alarm panels, zones, and central monitoring',
+    category: 'Security Systems',
+    tags: ['intrusion-detection', 'alarm', 'sensors', 'physical-security', 'monitoring'],
+    dsl: '''CREATE system
+TYPE intrusion-detection
+SENSORS PIR motion, door/window contact, glass-break, vibration, beam-sensor
+ZONES perimeter, interior, silent-alarm, 24-hour, entry-exit
+PANEL dual-path communication (IP + cellular backup)
+FEATURES arm/disarm schedules, remote-arm, bypass-logging, tamper-detection, duress-code
+MONITORING central-station UL-listed, police-dispatch, mobile-app notifications
+POWER primary AC with 24-hour battery backup
+OUTPUT zone layout, sensor placement, panel config, monitoring procedures, and user training guide''',
+  ),
+
+  TemplateItem(
+    id: 'ss_security_operations_center',
+    title: 'Security Operations Center (SOC)',
+    description: 'SOC design with physical layout, tools, workflows, and analyst runbooks',
+    category: 'Security Systems',
+    tags: ['soc', 'security-operations', 'monitoring', 'incident-response', 'design'],
+    dsl: '''CREATE facility
+TYPE security-operations-center
+TIER 24/7 enterprise SOC
+LAYOUT video-wall, analyst workstations, supervisor station, incident-room, server-rack
+TOOLS SIEM, SOAR, threat-intelligence-platform, ticketing, communication
+WORKFLOWS alert-triage, incident-escalation, threat-hunting, shift-handover
+INTEGRATIONS physical-security (CCTV, access-control), IT-infrastructure, business-systems
+STAFFING tier-1 analysts, tier-2 investigators, tier-3 threat-hunters, SOC-manager
+OUTPUT SOC design document, floor plan, tool stack, runbooks, and staffing model''',
+  ),
+
+  TemplateItem(
+    id: 'ss_zero_trust_architecture',
+    title: 'Zero Trust Architecture',
+    description: 'Zero trust security model design with identity, device, and network controls',
+    category: 'Security Systems',
+    tags: ['zero-trust', 'identity', 'microsegmentation', 'ztna', 'architecture'],
+    dsl: '''CREATE architecture
+TYPE zero-trust
+PRINCIPLES verify-explicitly, least-privilege, assume-breach
+PILLARS identity, devices, network, applications, data, infrastructure
+COMPONENTS identity-provider (Okta/Entra ID), MFA, device-compliance, ZTNA, microsegmentation, CASB, DLP
+POLICIES conditional-access, just-in-time-access, session-recording, continuous-verification
+INTEGRATIONS SIEM, EDR, PAM, vulnerability-management
+MATURITY-STAGES initial, advanced, optimal
+OUTPUT architecture design, policy templates, implementation roadmap, and maturity assessment''',
+  ),
+
+  TemplateItem(
+    id: 'ss_security_audit',
+    title: 'Physical Security Audit',
+    description: 'Physical security assessment covering perimeter, access, surveillance, and policies',
+    category: 'Security Systems',
+    tags: ['physical-security', 'audit', 'assessment', 'compliance', 'risk'],
+    dsl: '''CREATE assessment
+TYPE physical-security-audit
+SCOPE building-perimeter, access-control, surveillance, data-centers, visitor-management
+STANDARDS ISO 27001 Annex A, NIST SP 800-116, SOC 2
+CHECKS perimeter-fencing, lighting, guard-patrols, badge-systems, tailgating-controls, visitor-logs, clean-desk
+FINDINGS format: control, observation, risk-level, recommendation
+RISK-LEVELS critical, high, medium, low
+OUTPUT audit report with findings, risk matrix, photo evidence placeholders, and remediation roadmap''',
+  ),
+
+  TemplateItem(
+    id: 'ss_guard_patrol_system',
+    title: 'Guard Tour & Patrol System',
+    description: 'Guard patrol management with checkpoints, schedules, incident reporting, and analytics',
+    category: 'Security Systems',
+    tags: ['guard-tour', 'patrol', 'checkpoint', 'incident-report', 'security-management'],
+    dsl: '''CREATE system
+TYPE guard-patrol-management
+FEATURES NFC/QR checkpoints, patrol-scheduling, real-time-tracking, incident-reporting, missed-checkpoint-alert
+CHECKPOINTS entrances, parking-lot, server-room, loading-dock, rooftop, emergency-exits
+REPORTS patrol-compliance, incident-log, guard-performance, shift-summary
+INTEGRATIONS access-control, CCTV, dispatch-center, HR-system
+MOBILE guard-app with offline-mode and GPS tracking
+DASHBOARD supervisor-view with live map and alert feed
+OUTPUT system design, checkpoint placement plan, patrol schedules, mobile app spec, and report templates''',
+  ),
+
+  TemplateItem(
+    id: 'ss_learn_security_systems',
+    title: 'Learn Security Systems',
+    description: 'Structured learning path for physical and electronic security systems professional',
+    category: 'Security Systems',
+    tags: ['learning', 'curriculum', 'physical-security', 'cctv', 'access-control', 'career'],
+    dsl: '''CREATE curriculum
+TYPE security-systems-learning-path
+LEVEL beginner-to-professional
+GOAL design, install, and manage integrated security systems
+DURATION 16 weeks
+TOPICS physical-security-fundamentals, access-control, CCTV, intrusion-detection, fire-alarm, intercoms, IP-networking, low-voltage-wiring, codes-and-standards, system-integration, cybersecurity-for-physical-systems
+CERTIFICATIONS PSP (Physical Security Professional), Lenel, Genetec, Axis, CompTIA Security+
+HANDS-ON labs for wiring, programming panels, configuring NVRs, and integrating systems
+OUTPUT week-by-week study plan, lab exercises, certification roadmap, and career path guide''',
+  ),
+
+  // ── Engineering ───────────────────────────────────────────────────────────
+
+  TemplateItem(
+    id: 'eng_software_architecture',
+    title: 'Software Architecture Design',
+    description: 'Design a scalable software architecture with components, patterns, and trade-off analysis',
+    category: 'Engineering',
+    tags: ['architecture', 'design', 'microservices', 'patterns', 'scalability'],
+    dsl: '''CREATE document
+TYPE software-architecture
+SYSTEM distributed web platform
+PATTERNS microservices, event-driven, CQRS, saga, circuit-breaker
+COMPONENTS API-gateway, auth-service, domain-services, message-broker, cache, CDN, database-per-service
+QUALITIES scalability, fault-tolerance, observability, security, maintainability
+DIAGRAMS C4-model: context, container, component
+TRADE-OFFS consistency-vs-availability, coupling-vs-autonomy, complexity-vs-flexibility
+OUTPUT architecture document with diagrams, ADRs, and technology selection rationale''',
+  ),
+
+  TemplateItem(
+    id: 'eng_embedded_firmware',
+    title: 'Embedded Systems Firmware',
+    description: 'Firmware design for a microcontroller with RTOS, peripherals, and OTA updates',
+    category: 'Engineering',
+    tags: ['embedded', 'firmware', 'rtos', 'microcontroller', 'iot', 'c'],
+    dsl: '''CREATE firmware
+TYPE embedded-system
+MCU STM32 / ESP32 / Raspberry Pi Pico
+RTOS FreeRTOS / Zephyr
+LANGUAGE C / C++
+PERIPHERALS UART, SPI, I2C, GPIO, ADC, PWM, CAN-bus
+FEATURES task-scheduling, watchdog, power-management, OTA-updates, bootloader, fault-handling
+PROTOCOLS MQTT, Modbus, BLE
+OUTPUT firmware architecture, HAL abstraction layer, task design, and build system (CMake)''',
+  ),
+
+  TemplateItem(
+    id: 'eng_mechanical_design',
+    title: 'Mechanical System Design',
+    description: 'Mechanical engineering design spec with requirements, materials, and analysis',
+    category: 'Engineering',
+    tags: ['mechanical', 'design', 'cad', 'fea', 'materials', 'manufacturing'],
+    dsl: '''CREATE specification
+TYPE mechanical-design
+SYSTEM structural bracket / actuator assembly / heat exchanger
+REQUIREMENTS load-bearing: 500N, operating-temp: -20°C to 120°C, IP67
+MATERIAL aluminum-6061 / stainless-steel-316 / carbon-fiber
+ANALYSIS FEA stress analysis, fatigue life, thermal analysis
+MANUFACTURING CNC machining, sheet metal, 3D printing (prototype)
+TOLERANCES GD&T per ASME Y14.5
+STANDARDS ISO 9001, ASTM material specs
+OUTPUT design spec, material selection rationale, FEA summary, and manufacturing drawing notes''',
+  ),
+
+  TemplateItem(
+    id: 'eng_electrical_circuit',
+    title: 'Electrical Circuit Design',
+    description: 'Electronic circuit design with schematic, BOM, PCB layout guidelines, and testing plan',
+    category: 'Engineering',
+    tags: ['electrical', 'circuit', 'pcb', 'schematic', 'electronics', 'hardware'],
+    dsl: '''CREATE design
+TYPE electronic-circuit
+FUNCTION power-supply / motor-driver / sensor-interface / RF-transceiver
+VOLTAGE 3.3V / 5V / 12V / 24V
+CURRENT max 2A
+COMPONENTS MCU, voltage-regulator, MOSFETs, op-amps, filters, protection-circuits
+TOOLS KiCad / Altium Designer
+PCB 4-layer, controlled impedance, EMC guidelines
+TESTING bench-verification, thermal-imaging, EMC pre-compliance
+OUTPUT schematic description, BOM, PCB layout rules, test procedure, and compliance checklist''',
+  ),
+
+  TemplateItem(
+    id: 'eng_systems_engineering',
+    title: 'Systems Engineering Plan',
+    description: 'MBSE-style systems engineering plan with requirements, architecture, and V&V',
+    category: 'Engineering',
+    tags: ['systems-engineering', 'mbse', 'requirements', 'verification', 'validation'],
+    dsl: '''CREATE plan
+TYPE systems-engineering
+METHODOLOGY MBSE, V-model
+PHASES concept, requirements, architecture, design, integration, verification, validation, operations
+REQUIREMENTS stakeholder, system, subsystem — with traceability matrix
+ARCHITECTURE functional, physical, logical views
+TOOLS SysML / Cameo, JIRA for requirements
+VERIFICATION test-plan with pass/fail criteria per requirement
+RISK risk-register with likelihood, impact, and mitigation
+OUTPUT SEMP document, SysML diagrams, requirements traceability matrix, and V&V plan''',
+  ),
+
+  TemplateItem(
+    id: 'eng_learn_engineering',
+    title: 'Learn Engineering Fundamentals',
+    description: 'Structured engineering learning path from fundamentals to specialization',
+    category: 'Engineering',
+    tags: ['learning', 'curriculum', 'engineering', 'fundamentals', 'career', 'roadmap'],
+    dsl: '''CREATE curriculum
+TYPE engineering-learning-path
+DISCIPLINE software / electrical / mechanical / systems
+LEVEL undergraduate-to-professional
+DURATION 24 weeks
+TOPICS calculus, linear-algebra, physics, thermodynamics, circuit-theory, programming, materials-science, control-systems, signal-processing, project-management
+PROJECTS bridge-design, PCB-design, control-system-simulation, capstone-project
+TOOLS MATLAB, Python, KiCad, SolidWorks, SPICE
+OUTPUT week-by-week curriculum, project briefs, resource list, and capstone guide''',
+  ),
+
+  // ── Reverse Engineering ───────────────────────────────────────────────────
+
+  TemplateItem(
+    id: 're_binary_analysis',
+    title: 'Binary Analysis',
+    description: 'Static and dynamic analysis of a binary executable to understand behavior and find vulnerabilities',
+    category: 'Reverse Engineering',
+    tags: ['binary-analysis', 'static-analysis', 'dynamic-analysis', 'ghidra', 'ida', 'malware'],
+    dsl: '''CREATE analysis
+TYPE binary-reverse-engineering
+TARGET unknown executable / malware sample / firmware image
+APPROACH static-first, then dynamic
+STATIC-TOOLS Ghidra, IDA Pro, Binary Ninja, strings, file, objdump, Detect-It-Easy
+DYNAMIC-TOOLS x64dbg, gdb, Frida, API Monitor, Wireshark, Process Monitor
+STEPS file-identification, entropy-check, import-table, string-extraction, disassembly, control-flow-graph, deobfuscation, behavior-analysis
+ARTIFACTS IOCs, YARA rules, function-rename map, call-graph
+OUTPUT analysis report with findings, IOCs, MITRE ATT&CK mapping, and annotated disassembly notes''',
+  ),
+
+  TemplateItem(
+    id: 're_protocol_reverse',
+    title: 'Network Protocol Reverse Engineering',
+    description: 'Reverse engineer an undocumented network protocol from packet captures',
+    category: 'Reverse Engineering',
+    tags: ['protocol-analysis', 'wireshark', 'network', 'reverse-engineering', 'fuzzing'],
+    dsl: '''CREATE analysis
+TYPE protocol-reverse-engineering
+TARGET proprietary binary protocol / undocumented API
+CAPTURE-TOOLS Wireshark, tcpdump, mitmproxy, Frida
+STEPS traffic-capture, session-identification, message-framing, field-mapping, checksum-analysis, state-machine-reconstruction
+TECHNIQUES differential-analysis, known-plaintext, fuzzing, replay-attacks
+OUTPUT protocol specification document, field definitions, state diagram, Scapy dissector, and fuzzer template''',
+  ),
+
+  TemplateItem(
+    id: 're_firmware_extraction',
+    title: 'Firmware Extraction & Analysis',
+    description: 'Extract and analyze embedded device firmware for security research',
+    category: 'Reverse Engineering',
+    tags: ['firmware', 'iot', 'binwalk', 'embedded', 'hardware-hacking', 'security'],
+    dsl: '''CREATE analysis
+TYPE firmware-reverse-engineering
+TARGET IoT device / router / industrial-controller
+EXTRACTION-METHODS UART-console, JTAG/SWD, flash-chip-dump, OTA-update-intercept, vendor-portal
+TOOLS binwalk, dd, flashrom, OpenOCD, UART-adapter, logic-analyzer
+ANALYSIS filesystem-extraction, hardcoded-credentials, debug-interfaces, update-mechanism, crypto-keys, vulnerable-libraries
+EMULATION QEMU full-system, Firmwalker, FAT
+OUTPUT extraction procedure, filesystem tree, vulnerability findings, and re-flashing guide''',
+  ),
+
+  TemplateItem(
+    id: 're_mobile_app',
+    title: 'Mobile App Reverse Engineering',
+    description: 'Decompile and analyze an Android or iOS app for security assessment',
+    category: 'Reverse Engineering',
+    tags: ['mobile', 'android', 'ios', 'apk', 'frida', 'jadx', 'security'],
+    dsl: '''CREATE analysis
+TYPE mobile-reverse-engineering
+PLATFORM Android APK / iOS IPA
+TOOLS jadx, apktool, MobSF, Frida, objection, r2frida, class-dump
+STEPS unpack, decompile, manifest-analysis, hardcoded-secrets, network-traffic-interception, SSL-pinning-bypass, root-detection-bypass, dynamic-instrumentation
+CHECKS insecure-storage, weak-crypto, exported-components, deep-links, third-party-SDKs
+OUTPUT security report with findings, PoC scripts, and remediation recommendations''',
+  ),
+
+  TemplateItem(
+    id: 're_learn_reverse_engineering',
+    title: 'Learn Reverse Engineering',
+    description: 'Structured learning path for binary reverse engineering from zero to advanced',
+    category: 'Reverse Engineering',
+    tags: ['learning', 'curriculum', 'reverse-engineering', 'assembly', 'ghidra', 'malware'],
+    dsl: '''CREATE curriculum
+TYPE reverse-engineering-learning-path
+LEVEL beginner-to-advanced
+DURATION 20 weeks
+TOPICS x86/x64 assembly, calling-conventions, PE/ELF-format, static-analysis, dynamic-analysis, anti-reversing-techniques, malware-families, exploit-development, kernel-internals
+TOOLS Ghidra, x64dbg, IDA Free, pwndbg, Python scripting
+PRACTICE crackmes.one, malware-traffic-analysis, pwn.college, reverse.engineering CTF challenges
+OUTPUT week-by-week study plan, hands-on challenge list, tool cheat sheet, and career roadmap''',
+  ),
+
+  // ── Mathematics ───────────────────────────────────────────────────────────
+
+  TemplateItem(
+    id: 'math_proof_assistant',
+    title: 'Mathematical Proof Assistant',
+    description: 'Guide to constructing formal proofs with proof strategies and worked examples',
+    category: 'Mathematics',
+    tags: ['proof', 'formal-math', 'logic', 'theorem', 'discrete-math'],
+    dsl: '''CREATE guide
+TYPE mathematical-proof
+TOPIC group-theory / real-analysis / number-theory / combinatorics
+PROOF-METHODS direct, contradiction, induction, contrapositive, construction, pigeonhole
+STRUCTURE statement, definitions, lemmas, main-proof, corollaries
+NOTATION LaTeX-ready
+LEVEL undergraduate
+OUTPUT proof template with strategy selection guide, worked examples, and common pitfalls''',
+  ),
+
+  TemplateItem(
+    id: 'math_linear_algebra',
+    title: 'Linear Algebra Problem Solver',
+    description: 'Structured approach to linear algebra problems with step-by-step solutions',
+    category: 'Mathematics',
+    tags: ['linear-algebra', 'matrices', 'eigenvalues', 'vectors', 'transformations'],
+    dsl: '''CREATE solver
+TYPE linear-algebra
+TOPICS matrices, determinants, vector-spaces, linear-transformations, eigenvalues, SVD, PCA, least-squares
+PROBLEM-TYPES computation, proof, application
+NOTATION matrix-form, index-form, geometric-interpretation
+TOOLS NumPy, MATLAB, Wolfram Alpha
+APPLICATIONS machine-learning, graphics, quantum-computing, signals
+OUTPUT step-by-step solution template, geometric intuition, code verification, and application context''',
+  ),
+
+  TemplateItem(
+    id: 'math_calculus',
+    title: 'Calculus & Analysis',
+    description: 'Calculus problem framework covering limits, derivatives, integrals, and series',
+    category: 'Mathematics',
+    tags: ['calculus', 'analysis', 'derivatives', 'integrals', 'series', 'differential-equations'],
+    dsl: '''CREATE framework
+TYPE calculus
+TOPICS limits, continuity, differentiation, integration, multivariable-calculus, vector-calculus, differential-equations, series-and-sequences
+TECHNIQUES substitution, integration-by-parts, partial-fractions, Laplace-transform, Fourier-series
+VISUALIZATION function-plotting, slope-fields, surface-plots
+TOOLS Python sympy, Wolfram Alpha, Desmos, MATLAB
+APPLICATIONS physics, engineering, machine-learning, economics
+OUTPUT solution walkthrough, symbolic computation code, visualization script, and common mistakes guide''',
+  ),
+
+  TemplateItem(
+    id: 'math_applied_optimization',
+    title: 'Applied Optimization',
+    description: 'Formulate and solve optimization problems: linear, nonlinear, and combinatorial',
+    category: 'Mathematics',
+    tags: ['optimization', 'linear-programming', 'convex', 'operations-research', 'algorithms'],
+    dsl: '''CREATE solution
+TYPE optimization
+PROBLEM-TYPE linear-programming / integer-programming / convex / nonlinear / combinatorial
+FORMULATION objective-function, constraints, decision-variables, bounds
+SOLVERS PuLP, scipy.optimize, CVXPY, Gurobi, OR-Tools
+METHODS simplex, interior-point, branch-and-bound, gradient-descent, genetic-algorithm
+APPLICATIONS scheduling, resource-allocation, route-optimization, portfolio, ML-hyperparameters
+OUTPUT problem formulation, solver code, sensitivity analysis, and result interpretation''',
+  ),
+
+  TemplateItem(
+    id: 'math_statistics_probability',
+    title: 'Statistics & Probability',
+    description: 'Statistical analysis and probability framework with distributions, tests, and inference',
+    category: 'Mathematics',
+    tags: ['statistics', 'probability', 'distributions', 'inference', 'bayesian', 'hypothesis-testing'],
+    dsl: '''CREATE analysis
+TYPE statistics-and-probability
+TOPICS descriptive-statistics, probability-distributions, hypothesis-testing, confidence-intervals, regression, ANOVA, Bayesian-inference, Monte-Carlo
+DISTRIBUTIONS normal, binomial, Poisson, exponential, chi-squared, t-distribution
+TESTS t-test, ANOVA, chi-squared, Mann-Whitney, Kolmogorov-Smirnov
+TOOLS Python scipy/statsmodels, R, Jupyter
+VISUALIZATION histograms, QQ-plots, boxplots, probability-plots
+OUTPUT analysis template, test selection flowchart, code examples, and result interpretation guide''',
+  ),
+
+  TemplateItem(
+    id: 'math_learn_mathematics',
+    title: 'Learn Mathematics (Roadmap)',
+    description: 'Complete mathematics learning path from foundations through advanced topics',
+    category: 'Mathematics',
+    tags: ['learning', 'curriculum', 'mathematics', 'roadmap', 'self-study'],
+    dsl: '''CREATE curriculum
+TYPE mathematics-learning-path
+LEVEL high-school-to-graduate
+DURATION 52 weeks
+TRACKS pure-math, applied-math, statistics, discrete-math
+TOPICS pre-calculus, calculus, linear-algebra, differential-equations, real-analysis, abstract-algebra, probability, statistics, numerical-methods, topology
+RESOURCES MIT OpenCourseWare, 3Blue1Brown, Paul's Math Notes, Art of Problem Solving
+MILESTONES weekly problem sets, monthly proof challenges, semester capstone problems
+OUTPUT year-long study plan, topic prerequisites map, resource links, and self-assessment checkpoints''',
+  ),
+
+  // ── Science ───────────────────────────────────────────────────────────────
+
+  TemplateItem(
+    id: 'sci_experiment_design',
+    title: 'Scientific Experiment Design',
+    description: 'Design a controlled experiment with hypothesis, methodology, and statistical power',
+    category: 'Science',
+    tags: ['experiment', 'scientific-method', 'hypothesis', 'methodology', 'research-design'],
+    dsl: '''CREATE experiment
+TYPE controlled-scientific-experiment
+FIELD biology / chemistry / physics / psychology
+HYPOTHESIS null and alternative hypothesis
+VARIABLES independent, dependent, controlled, confounding
+DESIGN randomized-controlled, double-blind, factorial, crossover
+SAMPLE-SIZE power-analysis: alpha 0.05, power 0.80, effect-size 0.5
+STATISTICS planned analysis: t-test / ANOVA / regression
+ETHICS IRB/IACUC consideration, data-privacy
+OUTPUT experiment protocol, data collection sheet, statistical analysis plan, and write-up template''',
+  ),
+
+  TemplateItem(
+    id: 'sci_physics_simulation',
+    title: 'Physics Simulation',
+    description: 'Numerical simulation of a physical system with equations of motion and visualization',
+    category: 'Science',
+    tags: ['physics', 'simulation', 'numerical-methods', 'ode', 'python', 'visualization'],
+    dsl: '''CREATE simulation
+TYPE physics
+SYSTEM n-body gravitational / fluid-dynamics / electromagnetic / quantum-particle
+EQUATIONS Newtons-laws / Navier-Stokes / Maxwell / Schrödinger
+NUMERICAL-METHOD Runge-Kutta 4, Euler, Verlet, finite-difference
+STACK Python, NumPy, SciPy, Matplotlib, Pygame / VPython
+PARAMETERS configurable: mass, initial-conditions, time-step, boundary-conditions
+VISUALIZATION real-time animation, phase-space plots, energy conservation check
+OUTPUT simulation code, parameter config, animation renderer, and validation against analytical solution''',
+  ),
+
+  TemplateItem(
+    id: 'sci_chemistry_lab',
+    title: 'Chemistry Lab Protocol',
+    description: 'Detailed laboratory protocol with safety, procedures, calculations, and analysis',
+    category: 'Science',
+    tags: ['chemistry', 'lab', 'protocol', 'safety', 'synthesis', 'analysis'],
+    dsl: '''CREATE protocol
+TYPE chemistry-lab
+EXPERIMENT organic-synthesis / titration / spectroscopy / electrochemistry
+MATERIALS reagents with CAS numbers, quantities, hazard-classifications
+SAFETY GHS hazard symbols, PPE requirements, waste-disposal, emergency-procedures
+PROCEDURE step-by-step with times, temperatures, and critical-checkpoints
+CALCULATIONS stoichiometry, yield, molarity, error-analysis
+ANALYSIS characterization methods: NMR, IR, HPLC, melting-point
+OUTPUT lab protocol, safety checklist, calculation worksheet, and results template''',
+  ),
+
+  TemplateItem(
+    id: 'sci_applied_physics',
+    title: 'Applied Physics Problem',
+    description: 'Framework for solving applied physics problems across mechanics, thermodynamics, and E&M',
+    category: 'Science',
+    tags: ['applied-physics', 'mechanics', 'thermodynamics', 'electromagnetism', 'problem-solving'],
+    dsl: '''CREATE solution
+TYPE applied-physics
+DOMAIN classical-mechanics / thermodynamics / electromagnetism / optics / fluid-mechanics
+APPROACH draw-FBD, identify-laws, set-up-equations, solve-symbolically, substitute-numbers, sanity-check
+LAWS Newtons-laws, conservation-of-energy, Gauss-law, Faraday, first/second-law-of-thermodynamics
+TOOLS Python sympy, MATLAB, Wolfram Alpha, Desmos
+UNITS SI with dimensional-analysis check
+OUTPUT problem setup, free-body diagram description, symbolic solution, numerical answer, and physical interpretation''',
+  ),
+
+  TemplateItem(
+    id: 'sci_biology_research',
+    title: 'Biology Research Framework',
+    description: 'Structured framework for molecular biology, genetics, or ecology research projects',
+    category: 'Science',
+    tags: ['biology', 'molecular-biology', 'genetics', 'research', 'bioinformatics'],
+    dsl: '''CREATE framework
+TYPE biology-research
+FIELD molecular-biology / genetics / ecology / neuroscience / bioinformatics
+QUESTION research question with PICO framework
+METHODS PCR, gel-electrophoresis, CRISPR, RNA-seq, BLAST, phylogenetic-analysis
+TOOLS BioPython, R Bioconductor, NCBI databases, ImageJ
+CONTROLS positive, negative, technical-replicates: 3, biological-replicates: 3
+ANALYSIS statistical-tests, pathway-enrichment, sequence-alignment
+OUTPUT research plan, methods section, analysis pipeline, and figure generation scripts''',
+  ),
+
+  TemplateItem(
+    id: 'sci_learn_science',
+    title: 'Learn Science (Roadmap)',
+    description: 'Comprehensive science learning path spanning physics, chemistry, biology, and applied sciences',
+    category: 'Science',
+    tags: ['learning', 'curriculum', 'science', 'roadmap', 'self-study', 'stem'],
+    dsl: '''CREATE curriculum
+TYPE science-learning-path
+LEVEL high-school-to-undergraduate
+DURATION 52 weeks
+TRACKS physics, chemistry, biology, earth-science, applied-science
+TOPICS scientific-method, mechanics, thermodynamics, electromagnetism, atomic-theory, organic-chemistry, cell-biology, genetics, ecology, materials-science
+LABS virtual-labs via PhET, home-experiments, data-analysis projects
+RESOURCES Khan Academy, MIT OpenCourseWare, Crash Course, OpenStax textbooks
+OUTPUT year-long study plan, topic map, lab project list, and assessment checkpoints''',
+  ),
+
+  // ── Cryptography & Blockchain ─────────────────────────────────────────────
+
+  TemplateItem(
+    id: 'crypto_fundamentals',
+    title: 'Cryptography Fundamentals',
+    description: 'Deep dive into symmetric, asymmetric, and hash-based cryptography with implementations',
+    category: 'Cryptography & Blockchain',
+    tags: ['cryptography', 'aes', 'rsa', 'elliptic-curve', 'hash', 'learning'],
+    dsl: '''CREATE guide
+TYPE cryptography-fundamentals
+TOPICS symmetric-encryption (AES-256-GCM), asymmetric-encryption (RSA, ECC), hash-functions (SHA-256, SHA-3), digital-signatures (ECDSA, EdDSA), key-exchange (ECDH, DH), MAC (HMAC), KDF (PBKDF2, Argon2, bcrypt)
+ATTACKS chosen-plaintext, timing-attacks, padding-oracle, birthday-attack, rainbow-tables
+IMPLEMENTATION Python cryptography library, OpenSSL, libsodium
+BEST-PRACTICES key-management, IV-reuse-prevention, authenticated-encryption, constant-time-comparison
+OUTPUT concept explanations, Python code examples, attack demos, and implementation checklist''',
+  ),
+
+  TemplateItem(
+    id: 'crypto_tls_pki',
+    title: 'TLS & PKI Implementation',
+    description: 'Build and configure a PKI with CA, certificates, TLS hardening, and certificate lifecycle',
+    category: 'Cryptography & Blockchain',
+    tags: ['tls', 'pki', 'certificates', 'ca', 'x509', 'ssl'],
+    dsl: '''CREATE infrastructure
+TYPE PKI-and-TLS
+COMPONENTS root-CA, intermediate-CA, leaf-certificates, CRL, OCSP, CT-logs
+CERTIFICATE-TYPES server-TLS, client-mTLS, code-signing, S/MIME
+TLS-VERSION 1.3 preferred, 1.2 fallback
+CIPHER-SUITES TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256
+TOOLS OpenSSL, cfssl, EJBCA, Let's Encrypt / ACME, cert-manager
+LIFECYCLE auto-renewal, revocation, monitoring expiry
+OUTPUT CA setup scripts, certificate templates, TLS config for nginx/Apache, and rotation runbook''',
+  ),
+
+  TemplateItem(
+    id: 'crypto_zero_knowledge',
+    title: 'Zero-Knowledge Proof System',
+    description: 'Design and implement a ZKP system using zk-SNARKs or zk-STARKs',
+    category: 'Cryptography & Blockchain',
+    tags: ['zkp', 'zero-knowledge', 'zk-snarks', 'zk-starks', 'circom', 'privacy'],
+    dsl: '''CREATE system
+TYPE zero-knowledge-proof
+SCHEME zk-SNARKs (Groth16 / PLONK) / zk-STARKs
+USE-CASE private-transaction, age-proof, range-proof, set-membership, authentication
+TOOLS Circom, snarkjs, Noir, Halo2, StarkNet
+CIRCUIT arithmetic-circuit with constraints
+TRUSTED-SETUP powers-of-tau ceremony (for SNARKs)
+VERIFICATION on-chain (Solidity verifier) / off-chain
+OUTPUT circuit definition, proof generation script, Solidity verifier contract, and gas cost analysis''',
+  ),
+
+  TemplateItem(
+    id: 'crypto_smart_contract',
+    title: 'Smart Contract (Solidity)',
+    description: 'Production-ready Solidity smart contract with security patterns, tests, and audit checklist',
+    category: 'Cryptography & Blockchain',
+    tags: ['smart-contract', 'solidity', 'ethereum', 'evm', 'defi', 'security'],
+    dsl: '''CREATE contract
+TYPE solidity-smart-contract
+NETWORK Ethereum / Polygon / Arbitrum / Base
+STANDARD ERC-20 / ERC-721 / ERC-1155 / custom
+FEATURES access-control, pausable, upgradeable (UUPS), reentrancy-guard, multi-sig
+STACK Solidity 0.8.x, Hardhat / Foundry, OpenZeppelin
+TESTING unit-tests, fuzz-tests, fork-tests
+SECURITY checks: reentrancy, integer-overflow, access-control, oracle-manipulation, front-running
+GAS gas-optimization: packing, unchecked, custom-errors
+OUTPUT contract code, test suite, deployment script, and security audit checklist''',
+  ),
+
+  TemplateItem(
+    id: 'crypto_defi_protocol',
+    title: 'DeFi Protocol',
+    description: 'Design a DeFi protocol — DEX, lending, yield farming, or stablecoin',
+    category: 'Cryptography & Blockchain',
+    tags: ['defi', 'dex', 'lending', 'yield', 'amm', 'liquidity', 'solidity'],
+    dsl: '''CREATE protocol
+TYPE DeFi
+MECHANISM AMM-DEX / lending-borrowing / yield-aggregator / stablecoin
+STACK Solidity 0.8.x, Foundry, Uniswap v3 SDK, Chainlink oracles, OpenZeppelin
+FEATURES liquidity-pools, fee-model, price-oracle, flash-loans, governance-token, timelock
+TOKENOMICS supply, distribution, vesting, staking-rewards
+SECURITY price-oracle-manipulation-protection, economic-attack-simulation, formal-verification
+AUDITS Slither, Echidna fuzzer, manual-review checklist
+OUTPUT protocol architecture, contract suite, tokenomics model, and security report''',
+  ),
+
+  TemplateItem(
+    id: 'crypto_nft_collection',
+    title: 'NFT Collection',
+    description: 'Launch an NFT collection with ERC-721, metadata, reveal mechanism, and marketplace listing',
+    category: 'Cryptography & Blockchain',
+    tags: ['nft', 'erc-721', 'metadata', 'ipfs', 'opensea', 'mint'],
+    dsl: '''CREATE collection
+TYPE NFT
+STANDARD ERC-721A (gas-optimized)
+NETWORK Ethereum mainnet / Polygon / Base
+FEATURES whitelist-mint (merkle-tree), public-mint, reveal-mechanism, royalties (EIP-2981), soulbound-option
+METADATA IPFS via Pinata / NFT.Storage, JSON schema
+MINT-PRICE configurable, ETH / ERC-20
+ROYALTIES 5% secondary sales
+MARKETPLACE OpenSea, Blur compatible
+OUTPUT ERC-721A contract, merkle-tree generator, metadata uploader, mint frontend, and deployment guide''',
+  ),
+
+  TemplateItem(
+    id: 'crypto_blockchain_node',
+    title: 'Custom Blockchain / L2',
+    description: 'Design a custom blockchain or Layer 2 network with consensus, VM, and node architecture',
+    category: 'Cryptography & Blockchain',
+    tags: ['blockchain', 'layer2', 'consensus', 'evm', 'rollup', 'node'],
+    dsl: '''CREATE blockchain
+TYPE custom-L1 / optimistic-rollup / zk-rollup
+CONSENSUS PoS / PoA / PBFT / Tendermint
+VM EVM-compatible / custom-WASM
+COMPONENTS p2p-network, mempool, block-producer, state-machine, RPC-node, bridge
+STACK Go / Rust, libp2p, LevelDB / RocksDB
+FEATURES finality, gas-model, native-token, bridge-to-Ethereum, block-explorer
+OUTPUT architecture design, consensus spec, node setup guide, bridge contract, and testnet deployment''',
+  ),
+
+  TemplateItem(
+    id: 'crypto_crypto_trading_bot',
+    title: 'Crypto Trading Bot',
+    description: 'Algorithmic crypto trading bot with strategy, backtesting, and exchange integration',
+    category: 'Cryptography & Blockchain',
+    tags: ['trading-bot', 'crypto', 'algorithmic-trading', 'backtesting', 'defi', 'ccxt'],
+    dsl: '''CREATE bot
+TYPE crypto-trading
+STACK Python 3.11, ccxt, pandas, TA-Lib, backtrader / vectorbt
+EXCHANGES Binance, Coinbase, Kraken, dYdX (DEX)
+STRATEGY trend-following / mean-reversion / arbitrage / market-making
+INDICATORS RSI, MACD, Bollinger-bands, EMA, volume-profile
+RISK-MANAGEMENT stop-loss, take-profit, position-sizing, max-drawdown-limit
+BACKTESTING historical OHLCV data, walk-forward validation, Sharpe ratio
+OUTPUT strategy code, backtesting report, live-trading runner, and risk dashboard''',
+  ),
+
+  TemplateItem(
+    id: 'crypto_wallet',
+    title: 'Crypto Wallet (HD Wallet)',
+    description: 'Build a hierarchical deterministic wallet with key derivation, signing, and multi-chain support',
+    category: 'Cryptography & Blockchain',
+    tags: ['wallet', 'hd-wallet', 'bip39', 'bip44', 'key-management', 'multi-chain'],
+    dsl: '''CREATE wallet
+TYPE HD-wallet
+STANDARDS BIP-39 mnemonic, BIP-32 key-derivation, BIP-44 path, BIP-84 native-segwit
+CHAINS Ethereum, Bitcoin, Solana, Polygon
+FEATURES mnemonic-generation, key-derivation, address-generation, transaction-signing, hardware-wallet-support (Ledger/Trezor)
+SECURITY encrypted-keystore, memory-safe key-handling, air-gap-signing
+STACK TypeScript, ethers.js v6, bitcoinjs-lib, @solana/web3.js
+OUTPUT wallet library, CLI tool, encrypted storage module, and hardware wallet adapter''',
+  ),
+
+  TemplateItem(
+    id: 'crypto_learn_cryptography',
+    title: 'Learn Cryptography',
+    description: 'Structured learning path from classical ciphers to modern applied cryptography',
+    category: 'Cryptography & Blockchain',
+    tags: ['learning', 'cryptography', 'curriculum', 'roadmap', 'math', 'security'],
+    dsl: '''CREATE curriculum
+TYPE cryptography-learning-path
+LEVEL beginner-to-advanced
+DURATION 20 weeks
+TOPICS classical-ciphers, information-theory, symmetric-cryptography, asymmetric-cryptography, hash-functions, digital-signatures, zero-knowledge-proofs, post-quantum-cryptography, protocols (TLS, SSH, Signal)
+MATH number-theory, modular-arithmetic, elliptic-curves, finite-fields, lattices
+RESOURCES Christof Paar lectures, Boneh-Shoup textbook, cryptopals.com challenges, CryptoHack
+HANDS-ON implement AES, RSA, ECDH from scratch, solve cryptopals sets
+OUTPUT week-by-week plan, math prerequisites, implementation exercises, and challenge progression''',
+  ),
+
+  TemplateItem(
+    id: 'crypto_learn_blockchain',
+    title: 'Learn Blockchain Development',
+    description: 'Complete blockchain development curriculum from Solidity basics to full DApp deployment',
+    category: 'Cryptography & Blockchain',
+    tags: ['learning', 'blockchain', 'solidity', 'web3', 'dapp', 'curriculum'],
+    dsl: '''CREATE curriculum
+TYPE blockchain-dev-learning-path
+LEVEL beginner-to-professional
+DURATION 24 weeks
+TOPICS blockchain-fundamentals, Solidity-basics, smart-contract-patterns, DeFi-protocols, NFTs, security-and-auditing, Layer2, cross-chain-bridges, ZK-proofs, full-stack-DApp
+TOOLS Hardhat, Foundry, ethers.js, wagmi, RainbowKit, The Graph, IPFS, OpenZeppelin
+PROJECTS ERC-20-token, NFT-collection, DEX, lending-protocol, full-DApp-with-frontend
+RESOURCES Cyfrin Updraft, Patrick Collins, Ethereum docs, Secureum
+OUTPUT week-by-week roadmap, project specs, audit checklist, and job-ready portfolio guide''',
   ),
 ];

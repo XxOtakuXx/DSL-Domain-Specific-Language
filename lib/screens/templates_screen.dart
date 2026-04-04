@@ -501,6 +501,18 @@ const Map<String, Color> _categoryColors = {
   'Creative': Color(0xFFD7BA7D),
   'Legal & HR': Color(0xFF858585),
   'Research': Color(0xFF9CDCFE),
+  'E-Commerce': Color(0xFF4FC1E9),
+  'Artificial Intelligence': Color(0xFFBB86FC),
+  'Cybersecurity': Color(0xFFFF6B6B),
+  'Data Engineering': Color(0xFF26C6DA),
+  'Cloud & Infrastructure': Color(0xFF42A5F5),
+  'Information Technology': Color(0xFF66BB6A),
+  'Security Systems': Color(0xFFEF5350),
+  'Engineering': Color(0xFFFFCA28),
+  'Reverse Engineering': Color(0xFFFF7043),
+  'Mathematics': Color(0xFF7E57C2),
+  'Science': Color(0xFF26A69A),
+  'Cryptography & Blockchain': Color(0xFFF7931A),
   'My Templates': Color(0xFF0078D4),
 };
 

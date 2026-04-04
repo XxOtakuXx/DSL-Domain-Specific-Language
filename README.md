@@ -20,6 +20,7 @@ Built with Flutter. No webview. No Electron. Real native performance.
 - New: **Font size controls** — increase or decrease the output panel font size (range: 10–20pt)
 - New: **Word wrap toggle** — switch the output panel between soft-wrapped and horizontally-scrollable views
 - New: **Save Template button** in the toolbar — save the current DSL directly from the editor with a title, description, category, and tags
+- Expanded: **162 built-in templates** across 19 categories — added E-Commerce, Artificial Intelligence, Cybersecurity, Data Engineering, Cloud & Infrastructure, Information Technology, Security Systems, Engineering, Reverse Engineering, Mathematics, Science, and Cryptography & Blockchain
 
 ---
 
@@ -119,24 +120,36 @@ That's **~23 tokens** — **51% fewer tokens**, same information. At scale acros
 
 ```text
 ┌──────────────────────────────────────────────────────────────┐
-│  CATEGORIES          │  🔍 Search templates…                 │
-│  ─────────────────   │  ────────────────────────────────────  │
-│  All Templates  83   │  83 templates                         │
-│  Software Dev   14   │                                       │
-│  Mobile          4   │  ┌──────────────┐ ┌──────────────┐   │
-│  API Design      5   │  │ Full-stack   │ │ REST API     │   │
-│  Content & Writ 10   │  │ Web App      │ │              │   │
-│  AI & Prompts    8   │  │ CREATE app   │ │ CREATE api   │   │
-│  DevOps          7   │  │ TYPE full... │ │ TYPE REST    │   │
-│  Data & ML       7   │  │              │ │              │   │
-│  Business        8   │  └──────────────┘ └──────────────┘   │
-│  Education       5   │                                       │
-│  Creative        5   │  (hover a card → "Use Template" btn)  │
-│  Legal & HR      6   │                                       │
-│  Research        4   │                                       │
-│  ─────────────────   │                                       │
-│  My Templates    2   │  (MINE badge on custom cards)         │
-└──────────────────────┴──────────────────────────────────────┘
+│  CATEGORIES               │  🔍 Search templates…            │
+│  ──────────────────────   │  ───────────────────────────────  │
+│  All Templates       162  │  162 templates                   │
+│  Software Dev         14  │                                  │
+│  Mobile                4  │  ┌──────────────┐ ┌───────────┐  │
+│  API Design            5  │  │ Full-stack   │ │ REST API  │  │
+│  Content & Writing    10  │  │ Web App      │ │           │  │
+│  AI & Prompts          8  │  │ CREATE app   │ │ CREATE api│  │
+│  DevOps                7  │  │ TYPE full... │ │ TYPE REST │  │
+│  Data & ML             7  │  │              │ │           │  │
+│  Business              8  │  └──────────────┘ └───────────┘  │
+│  Education             5  │                                  │
+│  Creative              5  │  (hover → "Use Template" btn)    │
+│  Legal & HR            6  │                                  │
+│  Research              4  │                                  │
+│  E-Commerce            6  │                                  │
+│  Artificial Intel.     8  │                                  │
+│  Cybersecurity         6  │                                  │
+│  Data Engineering      5  │                                  │
+│  Cloud & Infra         5  │                                  │
+│  Information Tech      6  │                                  │
+│  Security Systems      8  │                                  │
+│  Engineering           6  │                                  │
+│  Reverse Engineering   5  │                                  │
+│  Mathematics           6  │                                  │
+│  Science               6  │                                  │
+│  Crypto & Blockchain  11  │                                  │
+│  ──────────────────────   │                                  │
+│  My Templates          2  │  (MINE badge on custom cards)    │
+└───────────────────────────┴──────────────────────────────────┘
 ```
 
 **History tab:**
@@ -320,14 +333,14 @@ The **Copy** button (top-right of the output panel) copies the current tab's con
 
 ### 5. Use the Template Library
 
-Click the **Templates** tab in the title bar to browse 83 ready-made DSL prompts:
+Click the **Templates** tab in the title bar to browse 162 ready-made DSL prompts:
 
 - **Filter by category** — click any category in the left sidebar
 - **Search** — type in the search bar to filter by title, description, or tags
 - **Load a template** — hover a card and click **Use Template** to load it into the editor and jump straight to the Editor tab
 - **My Templates** section appears in the sidebar once you have saved any custom templates
 
-Templates cover: Software Dev, Mobile, API Design, Content & Writing, AI & Prompts, DevOps, Data & ML, Business, Education, Creative, Legal & HR, and Research.
+Templates cover 19 categories: Software Dev, Mobile, API Design, Content & Writing, AI & Prompts, DevOps, Data & ML, Business, Education, Creative, Legal & HR, Research, E-Commerce, Artificial Intelligence, Cybersecurity, Data Engineering, Cloud & Infrastructure, Information Technology, Security Systems, Engineering, Reverse Engineering, Mathematics, Science, and Cryptography & Blockchain.
 
 ---
 
@@ -791,7 +804,7 @@ lib/
 ├── providers/
 │   └── dsl_providers.dart            Riverpod state providers (14 providers)
 ├── data/
-│   └── template_library.dart         83 built-in DSL templates (pure Dart, no I/O)
+│   └── template_library.dart         162 built-in DSL templates across 19 categories
 ├── services/
 │   ├── parser.dart                   DSL text → Map<String, dynamic>
 │   ├── prompt_builder.dart           Map → compact prompt / expanded prompt
@@ -799,6 +812,7 @@ lib/
 │   ├── ai_parser.dart                Dispatches to the configured AI provider
 │   ├── settings_service.dart         Persists provider selection + API key
 │   ├── file_service.dart             Load, save, export via file_picker
+│   ├── database_helper.dart          Shared SQLite singleton with schema migration
 │   ├── history_service.dart          SQLite-backed generation history (max 100)
 │   ├── custom_template_service.dart  SQLite-backed personal template library
 │   ├── token_counter.dart            Approximate token count for output display
@@ -819,7 +833,6 @@ lib/
     ├── output_panel.dart             Tabbed output with token count, font size, word wrap
     ├── toolbar.dart                  Generate, Clear, Save Template, mode toggle, file ops
     ├── command_palette.dart          Ctrl+P command launcher + DSL reference panel
-    ├── settings_panel.dart           Provider selector UI component
     └── title_bar.dart                Custom title bar with nav tabs + window controls
 ```
 
@@ -941,7 +954,7 @@ sudo apt-get install clang cmake ninja-build pkg-config libgtk-3-dev
 In DSL mode and Plain Talk with no provider configured: no. Everything is fully offline. If you configure an AI provider in Settings, your Plain Talk input is sent to that provider's API when you press Generate. Your API key is stored locally in the system's shared preferences — it never leaves your machine otherwise.
 
 **Q: Can I use the template library offline?**
-Yes. All 83 templates are compiled into the app as Dart data. No network, no files, no I/O — they load instantly.
+Yes. All 162 templates are compiled into the app as Dart data. No network, no files, no I/O — they load instantly.
 
 **Q: Can I add my own keywords to the compression map?**
 Yes — edit the `_compress` map in [lib/services/prompt_builder.dart](lib/services/prompt_builder.dart). Add any `'input': 'output'` entry.

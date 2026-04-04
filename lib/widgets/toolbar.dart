@@ -557,7 +557,12 @@ class _TemplateFormResult {
 const _kCategories = [
   'Software Dev', 'Mobile', 'API Design', 'Content & Writing',
   'AI & Prompts', 'DevOps', 'Data & ML', 'Business',
-  'Education', 'Creative', 'Legal & HR', 'Research', 'My Templates',
+  'Education', 'Creative', 'Legal & HR', 'Research',
+  'E-Commerce', 'Artificial Intelligence', 'Cybersecurity',
+  'Data Engineering', 'Cloud & Infrastructure', 'Information Technology',
+  'Security Systems', 'Engineering', 'Reverse Engineering',
+  'Mathematics', 'Science', 'Cryptography & Blockchain',
+  'My Templates',
 ];
 
 class _SaveTemplateDialog extends StatefulWidget {
