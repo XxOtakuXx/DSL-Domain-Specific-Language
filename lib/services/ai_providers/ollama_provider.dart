@@ -34,7 +34,10 @@ class OllamaProvider implements AiProvider {
         .timeout(const Duration(seconds: 30));
 
     if (response.statusCode != 200) {
-      throw Exception('Ollama ${response.statusCode}: ${response.body}');
+      final snippet = response.body.length > 200
+          ? '${response.body.substring(0, 200)}…'
+          : response.body;
+      throw Exception('Ollama ${response.statusCode}: $snippet');
     }
 
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;

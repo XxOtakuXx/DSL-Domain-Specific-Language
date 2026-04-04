@@ -9,11 +9,11 @@ class DatabaseHelper {
   factory DatabaseHelper() => _instance;
   DatabaseHelper._internal();
 
-  Database? _db;
+  Future<Database>? _dbFuture;
 
-  Future<Database> get database async {
-    _db ??= await _initDb();
-    return _db!;
+  Future<Database> get database {
+    _dbFuture ??= _initDb();
+    return _dbFuture!;
   }
 
   Future<Database> _initDb() async {

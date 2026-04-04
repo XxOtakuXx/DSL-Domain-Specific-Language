@@ -38,7 +38,10 @@ class GeminiProvider implements AiProvider {
     ).timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
-      throw Exception('Gemini ${response.statusCode}: ${response.body}');
+      final snippet = response.body.length > 200
+          ? '${response.body.substring(0, 200)}…'
+          : response.body;
+      throw Exception('Gemini ${response.statusCode}: $snippet');
     }
 
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;

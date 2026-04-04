@@ -35,7 +35,10 @@ class OpenAiProvider implements AiProvider {
     ).timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
-      throw Exception('OpenAI ${response.statusCode}: ${response.body}');
+      final snippet = response.body.length > 200
+          ? '${response.body.substring(0, 200)}…'
+          : response.body;
+      throw Exception('OpenAI ${response.statusCode}: $snippet');
     }
 
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
