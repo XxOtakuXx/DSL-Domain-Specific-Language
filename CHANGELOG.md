@@ -32,6 +32,8 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 - **Bug:** Template cards for new categories were falling back to a generic accent color — `_categoryColors` map now covers all 19 built-in categories.
 - **Bug:** Save Template dialog was missing all new categories — `_kCategories` list updated to match.
+- **Security:** API error responses now truncated to 200 chars — prevents leaking internal API details, request IDs, or partial key echoes to the UI.
+- **Stability:** Database init race condition eliminated — `DatabaseHelper` now caches the `Future<Database>` itself instead of the resolved value, preventing duplicate connections when concurrent callers hit `database` before the first init completes.
 
 ---
 
