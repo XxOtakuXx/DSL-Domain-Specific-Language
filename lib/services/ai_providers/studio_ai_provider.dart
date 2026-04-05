@@ -668,16 +668,23 @@ class _StudioEngine {
       }
     }
 
-    // Infer auth from context clues
-    if (_anyOf(t, ['login', 'sign in', 'sign up', 'register', 'user account', 'authentication', 'authorization'])) {
-      // Only infer if a framework suggests a default
+    // Infer auth from context clues — always set something when auth-related words appear
+    if (_anyOf(t, ['login', 'sign in', 'sign up', 'register', 'user account',
+                   'authentication', 'authorization', 'password', 'forgot password',
+                   'reset password', 'account', 'profile', 'user management'])) {
       final fw = ctx.result['framework']?.toString().toLowerCase() ?? '';
       if (_anyOf(fw, ['next.js', 'remix'])) {
         ctx.result['auth'] ??= 'NextAuth';
-      } else if (fw.contains('supabase') || ctx.lower.contains('supabase')) {
+      } else if (fw.contains('supabase') || t.contains('supabase')) {
         ctx.result['auth'] ??= 'Supabase Auth';
-      } else if (ctx.lower.contains('firebase')) {
+      } else if (t.contains('firebase')) {
         ctx.result['auth'] ??= 'Firebase Auth';
+      } else if (_anyOf(t, ['flutter', 'android', 'ios', 'mobile'])) {
+        ctx.result['auth'] ??= 'JWT';
+      } else if (_anyOf(t, ['django', 'rails', 'laravel'])) {
+        ctx.result['auth'] ??= 'session-based auth';
+      } else {
+        ctx.result['auth'] ??= 'JWT';
       }
     }
   }
@@ -1492,31 +1499,42 @@ class _StudioEngine {
       case _Mode.app:
         final type = ctx.result['type']?.toString() ?? '';
         final desc = ctx.result['description']?.toString() ?? '';
-        final platform = type == 'mobile' ? 'mobile app' :
-                         type == 'desktop' ? 'desktop app' :
-                         type == 'cli' ? 'CLI tool' :
-                         type == 'api' ? 'API service' :
-                         type == 'web' ? 'web app' : 'app';
+        final fw   = ctx.result['framework']?.toString() ?? '';
+        final lang = ctx.result['language']?.toString() ?? '';
+        final tech = fw.isNotEmpty ? fw : lang.isNotEmpty ? lang : null;
 
-        if (_anyOf(t, ['openapi', 'swagger'])) return 'OpenAPI spec + implementation';
-
-        if (desc.isNotEmpty) {
-          return 'complete $platform — full source code, project structure, setup instructions, '
-              'and implementation for: $desc';
+        if (_anyOf(t, ['openapi', 'swagger'])) {
+          return 'OpenAPI 3.0 spec + full implementation with examples';
         }
 
-        // Type-specific defaults with richer description
+        final suffix = 'with complete file structure, source code, '
+            'dependency list, setup/run instructions, and inline comments';
+
         if (type == 'api') {
-          return 'full API implementation with endpoints, models, validation, and README';
+          return 'full${tech != null ? " $tech" : ""} API implementation — '
+              'all endpoints, request/response models, validation, error handling, and README';
         }
         if (type == 'mobile') {
-          final fw = ctx.result['framework']?.toString() ?? '';
-          return 'complete ${fw.isNotEmpty ? fw : "mobile"} app — screens, navigation, state management, and build setup';
+          final mobilePlatform = desc.contains('android') ? 'Android'
+              : desc.contains('ios') ? 'iOS' : 'cross-platform';
+          return 'complete $mobilePlatform${tech != null ? " ($tech)" : ""} app $suffix';
         }
-        if (type == 'cli') return 'complete CLI implementation with argument parsing and help docs';
-        if (type == 'desktop') return 'complete desktop app with UI, state management, and installer setup';
-        if (type == 'web') return 'complete web app — pages, components, routing, and deployment config';
-        return 'full implementation with file structure, source code, and setup instructions';
+        if (type == 'cli') {
+          return 'complete CLI tool — argument parsing, help text, error handling, '
+              'and installation instructions';
+        }
+        if (type == 'desktop') {
+          return 'complete${tech != null ? " $tech" : ""} desktop app $suffix';
+        }
+        if (type == 'web') {
+          return 'complete${tech != null ? " $tech" : ""} web app $suffix '
+              'and deployment configuration';
+        }
+
+        if (desc.isNotEmpty) {
+          return 'full implementation $suffix — purpose: $desc';
+        }
+        return 'full implementation $suffix';
     }
   }
 
