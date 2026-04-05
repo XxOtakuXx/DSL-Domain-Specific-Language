@@ -12,6 +12,13 @@ const _providerMeta = {
     link: '',
     linkLabel: '',
   ),
+  AiProviderId.studio: (
+    label: 'Studio AI',
+    keyHint: '',
+    keyLabel: '',
+    link: '',
+    linkLabel: '',
+  ),
   AiProviderId.gemini: (
     label: 'Gemini',
     keyHint: 'AIza...',
@@ -101,7 +108,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   bool get _aiActive =>
       _selectedId != AiProviderId.none &&
-      (_selectedId == AiProviderId.ollama ||
+      (_selectedId == AiProviderId.studio ||
+          _selectedId == AiProviderId.ollama ||
           _keyController.text.trim().isNotEmpty);
 
   @override
@@ -202,7 +210,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           const SizedBox(width: 10),
           Text(
-            active ? 'AI Active — ${meta.label}' : 'Offline mode — using rule-based parser',
+            active
+                ? (_selectedId == AiProviderId.studio
+                    ? 'Studio AI Active — built-in, no API required'
+                    : 'AI Active — ${meta.label}')
+                : 'Offline mode — using rule-based parser',
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -278,6 +290,48 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           child: const Text(
             'No API key required.\nThe app will use the built-in rule-based parser to generate prompts from your Plain Talk input.',
             style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.6),
+          ),
+        );
+
+      case AiProviderId.studio:
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A2E1A),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: const Color(0xFF2E6A2E)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: const [
+                  Icon(Icons.auto_awesome, size: 15, color: Color(0xFF4EC9B0)),
+                  SizedBox(width: 8),
+                  Text(
+                    'Studio AI — Built-in, no setup required',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF4EC9B0),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Studio AI is a multi-pass NLP engine built directly into this app. '
+                'It requires no API key, no internet connection, and has no token limits.',
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.6),
+              ),
+              const SizedBox(height: 10),
+              const _FeatureRow(icon: Icons.bolt, label: 'Instant — zero latency, pure Dart'),
+              const _FeatureRow(icon: Icons.wifi_off, label: 'Fully offline — no network calls'),
+              const _FeatureRow(icon: Icons.token, label: 'No token limits — any length input'),
+              const _FeatureRow(icon: Icons.category, label: 'Detects 5 content modes automatically'),
+              const _FeatureRow(icon: Icons.layers, label: 'Extracts 20+ DSL keys from natural language'),
+              const _FeatureRow(icon: Icons.code, label: 'Knows 100+ technologies, frameworks, databases'),
+            ],
           ),
         );
 
@@ -438,6 +492,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const Text('Saved', style: TextStyle(fontSize: 13, color: AppColors.success)),
         ],
       ],
+    );
+  }
+}
+
+class _FeatureRow extends StatelessWidget {
+  const _FeatureRow({required this.icon, required this.label});
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 13, color: AppColors.textSecondary),
+          const SizedBox(width: 8),
+          Text(label,
+              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+        ],
+      ),
     );
   }
 }

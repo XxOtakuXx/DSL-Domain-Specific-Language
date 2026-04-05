@@ -3,6 +3,7 @@ import 'ai_providers/gemini_provider.dart';
 import 'ai_providers/openai_provider.dart';
 import 'ai_providers/anthropic_provider.dart';
 import 'ai_providers/ollama_provider.dart';
+import 'ai_providers/studio_ai_provider.dart';
 import 'plain_talk_parser.dart';
 
 class AiParser {
@@ -17,6 +18,8 @@ class AiParser {
     try {
       final Map<String, dynamic> result;
       switch (providerId) {
+        case AiProviderId.studio:
+          result = await const StudioAiProvider().parse(input);
         case AiProviderId.gemini:
           result = await GeminiProvider(apiKey).parse(input);
         case AiProviderId.openai:

@@ -20,7 +20,7 @@ final plainInputProvider = StateProvider<String>((ref) => '');
 
 // ── AI provider selection ─────────────────────────────────────────────────────
 
-enum AiProviderId { none, gemini, openai, anthropic, ollama }
+enum AiProviderId { none, studio, gemini, openai, anthropic, ollama }
 
 /// Which AI provider is currently selected.
 final selectedProviderIdProvider =
