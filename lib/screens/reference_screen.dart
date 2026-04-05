@@ -13,6 +13,7 @@ class _KeyEntry {
     this.compactOutput = '',
     this.expandedOutput = '',
     this.notes = '',
+    this.isIntro = false,
   });
 
   final String key;
@@ -22,6 +23,7 @@ class _KeyEntry {
   final String compactOutput;
   final String expandedOutput;
   final String notes;
+  final bool isIntro;
 }
 
 class _Category {
@@ -664,6 +666,7 @@ const List<_Category> _categories = [
         expandedOutput: 'Name: payment-service.',
         notes:
             'Custom key ideas: NAME, GOAL, OWNER, DEADLINE, PRIORITY, SCOPE, DEPENDENCIES, REFERENCES, NOTES.',
+        isIntro: true,
       ),
       _KeyEntry(
         key: 'NAME',
@@ -789,14 +792,15 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
 
   List<_KeyEntry> get _visibleKeys {
     if (_query.isNotEmpty) {
-      // Search across all categories
+      // Search across all categories — exclude intro entries
       return _categories
           .expand((c) => c.keys)
           .where((k) =>
-              k.key.toLowerCase().contains(_query) ||
-              k.purpose.toLowerCase().contains(_query) ||
-              k.explanation.toLowerCase().contains(_query) ||
-              k.example.toLowerCase().contains(_query))
+              !k.isIntro &&
+              (k.key.toLowerCase().contains(_query) ||
+               k.purpose.toLowerCase().contains(_query) ||
+               k.explanation.toLowerCase().contains(_query) ||
+               k.example.toLowerCase().contains(_query)))
           .toList();
     }
     return _categories[_selectedCategory].keys;
@@ -804,7 +808,8 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
 
   bool get _isSearching => _query.isNotEmpty;
 
-  int _totalKeys() => _categories.fold(0, (sum, c) => sum + c.keys.length);
+  int _keyCount(_Category cat) => cat.keys.where((k) => !k.isIntro).length;
+  int _totalKeys() => _categories.fold(0, (sum, c) => sum + _keyCount(c));
 
   @override
   Widget build(BuildContext context) {
@@ -859,7 +864,7 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
                       label: cat.name,
                       icon: cat.icon,
                       color: cat.color,
-                      count: cat.keys.length,
+                      count: _keyCount(cat),
                       active: active,
                       onTap: () => setState(() {
                         _selectedCategory = i;
@@ -940,7 +945,7 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
                           border: Border.all(color: AppColors.border),
                         ),
                         child: Text(
-                          '${_categories[_selectedCategory].keys.length}',
+                          '${_keyCount(_categories[_selectedCategory])}',
                           style: const TextStyle(
                               fontSize: 11, color: AppColors.textSecondary),
                         ),
@@ -974,11 +979,19 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
                           padding: const EdgeInsets.all(16),
                           itemCount: keys.length,
                           itemBuilder: (_, i) {
+                            final entry = keys[i];
+                            if (entry.isIntro) {
+                              final cat = _categories[_selectedCategory];
+                              return _IntroBanner(
+                                entry: entry,
+                                accentColor: cat.color,
+                              );
+                            }
                             final cat = _isSearching
-                                ? _categoryForKey(keys[i])
+                                ? _categoryForKey(entry)
                                 : _categories[_selectedCategory];
                             return _KeyCard(
-                              entry: keys[i],
+                              entry: entry,
                               accentColor: cat?.color ?? AppColors.accent,
                               showCategory: _isSearching,
                               categoryName: cat?.name ?? '',
@@ -1097,6 +1110,71 @@ class _SidebarItemState extends State<_SidebarItem> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ── Intro banner (Custom Keys header card) ────────────────────────────────────
+
+class _IntroBanner extends StatelessWidget {
+  const _IntroBanner({
+    required this.entry,
+    required this.accentColor,
+  });
+
+  final _KeyEntry entry;
+  final Color accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: accentColor.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: accentColor.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.info_outline, size: 15, color: accentColor),
+              const SizedBox(width: 8),
+              Text(
+                entry.purpose,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: accentColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            entry.explanation,
+            style: const TextStyle(
+              fontSize: 12,
+              height: 1.6,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          if (entry.notes.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              entry.notes,
+              style: const TextStyle(
+                fontSize: 11,
+                height: 1.5,
+                color: AppColors.textDisabled,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
