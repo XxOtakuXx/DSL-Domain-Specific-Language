@@ -43,6 +43,7 @@ class _StudioEngine {
     // ── Pass 3: domain-specific extraction ───────────────────────────────────
     switch (ctx.mode) {
       case _Mode.app:
+        _extractDescription(ctx);
         _extractStack(ctx);
         _extractFramework(ctx);
         _extractLanguage(ctx);
@@ -145,24 +146,26 @@ class _StudioEngine {
   // ── CREATE ────────────────────────────────────────────────────────────────
 
   void _extractCreate(_Context ctx) {
-    // Try full intent pattern first
+    // Try full intent pattern first — stop at functional clause starters
     final patterns = [
       RegExp(
         r'(?:build|create|make|design|develop|write|generate|scaffold)\s+'
         r'(?:me\s+)?(?:a\s+|an\s+|the\s+)?(.+?)'
-        r'(?:\s+(?:using|with|that|which|for|in|on|to|featuring)\b|[.,]|$)',
+        r'(?:\s+(?:using|with|that|which|for|in|on|featuring)\b'
+        r'|\s+to\s+(?!\w+\s+(?:app|tool|service|site|website))'  // "to X" only if X isn't another app noun
+        r'|[.,]|$)',
         caseSensitive: false,
       ),
       RegExp(
         r"(?:i\s+(?:want|need|'d\s+like)\s+(?:to\s+(?:build|create|make)?\s+)?(?:a\s+|an\s+)?)"
         r'(.+?)'
-        r'(?:\s+(?:using|with|that|which|for)\b|[.,]|$)',
+        r'(?:\s+(?:using|with|that|which|for|to)\b|[.,]|$)',
         caseSensitive: false,
       ),
       RegExp(
         r'(?:help\s+me\s+(?:build|create|make|design|write)\s+(?:a\s+|an\s+)?)'
         r'(.+?)'
-        r'(?:\s+(?:using|with|that)\b|[.,]|$)',
+        r'(?:\s+(?:using|with|that|to)\b|[.,]|$)',
         caseSensitive: false,
       ),
     ];
@@ -171,19 +174,47 @@ class _StudioEngine {
       final m = p.firstMatch(ctx.raw);
       if (m != null) {
         var create = m.group(1)?.trim() ?? '';
-        // Strip leading adjectives that belong in STYLE
+        // Strip leading style adjectives
         create = create
             .replaceAll(RegExp(r'^(?:modern\s+|clean\s+|minimal\s+|simple\s+|responsive\s+)+', caseSensitive: false), '')
             .trim();
-        if (create.isNotEmpty && create.length < 60) {
-          ctx.result['create'] = create;
-          return;
+        // If the captured value is too long it likely contains the description — truncate to the app-noun
+        if (create.isNotEmpty) {
+          final appNoun = _isolateAppNoun(create);
+          if (appNoun.isNotEmpty) {
+            ctx.result['create'] = appNoun;
+            return;
+          }
+          if (create.length < 60) {
+            ctx.result['create'] = create;
+            return;
+          }
         }
       }
     }
 
     // Fallback: use first noun phrase
     ctx.result['create'] = _inferCreate(ctx);
+  }
+
+  /// Strips the functional description tail from a captured create string.
+  /// e.g. "android app to torrent to direct download generator" → "android app"
+  /// e.g. "web app that converts pdf to word" → "web app"
+  String _isolateAppNoun(String raw) {
+    // Split on "to", "that", "which", "for", "with", "-"
+    final stopPattern = RegExp(
+      r'\s+(?:to|that|which|for|with|where|allowing|enabling)\s+',
+      caseSensitive: false,
+    );
+    final parts = raw.split(stopPattern);
+    if (parts.length > 1) {
+      final head = parts.first.trim();
+      // Validate the head looks like an app noun (≤ 4 words)
+      if (head.split(' ').length <= 4 && head.isNotEmpty) {
+        return head;
+      }
+    }
+    return raw.length < 40 ? raw : '';
   }
 
   String _inferCreate(_Context ctx) {
@@ -200,6 +231,182 @@ class _StudioEngine {
     if (_anyOf(t, ['email', 'newsletter'])) return 'email';
     if (_anyOf(t, ['script', 'automation'])) return 'script';
     return 'application';
+  }
+
+  // ── DESCRIPTION ───────────────────────────────────────────────────────────
+
+  /// Captures the functional purpose of the app — what it actually does.
+  /// e.g. "android app to torrent to direct download generator"
+  ///       → description = "converts torrent links to direct download links"
+  void _extractDescription(_Context ctx) {
+    final t = ctx.lower;
+
+    // 1. Explicit "that/which/to" functional clause
+    final functionalPattern = RegExp(
+      r'(?:app|tool|website|site|service|system|platform|bot|script|extension|plugin)\s+'
+      r'(?:to|that|which|for)\s+(.+?)(?:[.,]|$)',
+      caseSensitive: false,
+    );
+    final fm = functionalPattern.firstMatch(ctx.raw);
+    if (fm != null) {
+      final desc = fm.group(1)?.trim() ?? '';
+      if (desc.isNotEmpty && desc.length < 120) {
+        ctx.result['description'] = desc;
+        return;
+      }
+    }
+
+    // 2. "for X purpose" pattern
+    final forPattern = RegExp(
+      r'(?:build|create|make|develop)\s+(?:a\s+|an\s+)?(?:[\w\s]+?)\s+for\s+(.+?)(?:[.,]|$)',
+      caseSensitive: false,
+    );
+    final form = forPattern.firstMatch(ctx.raw);
+    if (form != null) {
+      final desc = form.group(1)?.trim() ?? '';
+      if (desc.isNotEmpty && desc.length < 120 && !_looksLikeAppNoun(desc)) {
+        ctx.result['description'] = desc;
+        return;
+      }
+    }
+
+    // 3. Domain keyword inference — compose a description from known concepts
+    final inferred = _inferDescription(t);
+    if (inferred.isNotEmpty) {
+      ctx.result['description'] = inferred;
+    }
+  }
+
+  bool _looksLikeAppNoun(String s) {
+    return RegExp(r'\b(?:app|website|tool|service|system|platform|dashboard)\b', caseSensitive: false).hasMatch(s);
+  }
+
+  String _inferDescription(String t) {
+    // File / download tools
+    if (_anyOf(t, ['torrent', '.torrent', 'magnet link'])) {
+      if (_anyOf(t, ['direct download', 'direct link', 'http download', 'debrid'])) {
+        return 'converts torrent/magnet links to direct HTTP download links';
+      }
+      return 'torrent management and download tool';
+    }
+    if (_anyOf(t, ['youtube downloader', 'yt downloader', 'video downloader'])) {
+      return 'downloads videos from YouTube and other platforms';
+    }
+    if (_anyOf(t, ['pdf to', 'convert pdf'])) {
+      return 'converts PDF files to other formats';
+    }
+    if (_anyOf(t, ['image compress', 'image resize', 'image convert', 'image optimizer'])) {
+      return 'compresses, resizes, and converts images';
+    }
+    if (_anyOf(t, ['url shortener', 'link shortener', 'short url'])) {
+      return 'shortens long URLs and tracks click analytics';
+    }
+    if (_anyOf(t, ['qr code', 'qr generator'])) {
+      return 'generates and scans QR codes';
+    }
+    if (_anyOf(t, ['barcode', 'barcode scanner'])) {
+      return 'generates and scans barcodes';
+    }
+    if (_anyOf(t, ['file converter', 'format converter', 'convert files'])) {
+      return 'converts files between formats';
+    }
+    if (_anyOf(t, ['file manager', 'file explorer', 'file browser'])) {
+      return 'browse, organize, and manage files';
+    }
+    if (_anyOf(t, ['cloud storage', 'file storage', 'file hosting'])) {
+      return 'upload, store, and share files in the cloud';
+    }
+
+    // Productivity tools
+    if (_anyOf(t, ['todo', 'to-do', 'task manager', 'task list', 'task tracker'])) {
+      return 'manage tasks and track productivity';
+    }
+    if (_anyOf(t, ['note', 'note-taking', 'notes app', 'notebook'])) {
+      return 'create, organize, and sync notes';
+    }
+    if (_anyOf(t, ['calendar', 'event', 'scheduling', 'scheduler', 'booking'])) {
+      return 'schedule events, manage calendar, and handle bookings';
+    }
+    if (_anyOf(t, ['habit tracker', 'habit', 'daily tracker'])) {
+      return 'track daily habits and streaks';
+    }
+    if (_anyOf(t, ['expense tracker', 'budget', 'finance tracker', 'money tracker'])) {
+      return 'track expenses and manage personal budget';
+    }
+    if (_anyOf(t, ['invoice', 'billing', 'invoicing'])) {
+      return 'create and manage invoices and billing';
+    }
+    if (_anyOf(t, ['password manager', 'credential manager'])) {
+      return 'securely store and manage passwords';
+    }
+    if (_anyOf(t, ['time tracker', 'time tracking', 'pomodoro', 'work timer'])) {
+      return 'track time spent on tasks and projects';
+    }
+
+    // Social / communication
+    if (_anyOf(t, ['social media', 'social network', 'social platform'])) {
+      return 'connect users through posts, follows, and interactions';
+    }
+    if (_anyOf(t, ['forum', 'community board', 'discussion board'])) {
+      return 'community discussion forum with threads and replies';
+    }
+    if (_anyOf(t, ['job board', 'job listing', 'job portal', 'job finder'])) {
+      return 'list and search job opportunities';
+    }
+    if (_anyOf(t, ['recipe', 'cooking app', 'food app', 'meal planner'])) {
+      return 'discover, save, and plan recipes and meals';
+    }
+    if (_anyOf(t, ['fitness', 'workout', 'gym tracker', 'exercise'])) {
+      return 'track workouts and monitor fitness progress';
+    }
+    if (_anyOf(t, ['travel', 'trip planner', 'itinerary'])) {
+      return 'plan trips and manage travel itineraries';
+    }
+    if (_anyOf(t, ['news', 'news reader', 'news aggregator', 'rss'])) {
+      return 'aggregate and display news from multiple sources';
+    }
+    if (_anyOf(t, ['weather', 'weather app', 'forecast'])) {
+      return 'display weather forecasts and conditions';
+    }
+    if (_anyOf(t, ['crypto', 'cryptocurrency', 'crypto tracker', 'bitcoin'])) {
+      return 'track cryptocurrency prices and portfolio';
+    }
+    if (_anyOf(t, ['stock', 'stock tracker', 'portfolio tracker', 'trading'])) {
+      return 'track stocks, portfolio performance, and market data';
+    }
+    if (_anyOf(t, ['music player', 'audio player', 'playlist'])) {
+      return 'play music, manage playlists, and browse library';
+    }
+    if (_anyOf(t, ['podcast', 'podcast player', 'podcast app'])) {
+      return 'discover, subscribe, and listen to podcasts';
+    }
+
+    // Dev tools
+    if (_anyOf(t, ['code editor', 'ide', 'code playground'])) {
+      return 'write, run, and share code in the browser';
+    }
+    if (_anyOf(t, ['api tester', 'api client', 'http client', 'postman clone'])) {
+      return 'test and debug HTTP API requests';
+    }
+    if (_anyOf(t, ['regex tester', 'regex playground'])) {
+      return 'test and visualize regular expressions';
+    }
+    if (_anyOf(t, ['color picker', 'color palette', 'palette generator'])) {
+      return 'pick colors and generate palettes';
+    }
+    if (_anyOf(t, ['diagram', 'flowchart', 'uml', 'wireframe'])) {
+      return 'create diagrams, flowcharts, and wireframes';
+    }
+
+    // E-learning
+    if (_anyOf(t, ['quiz', 'flashcard', 'flash card', 'study app', 'learning app'])) {
+      return 'study with interactive quizzes and flashcards';
+    }
+    if (_anyOf(t, ['lms', 'course platform', 'online course', 'e-learning'])) {
+      return 'deliver and manage online courses';
+    }
+
+    return '';
   }
 
   // ── TYPE ─────────────────────────────────────────────────────────────────
@@ -608,6 +815,48 @@ class _StudioEngine {
     // ── ML / AI features
     if (_anyOf(t, ['recommendation', 'recommend', 'suggested'])) found.add('recommendations');
     if (_anyOf(t, ['ai', 'ai-powered', 'gpt', 'openai', 'llm'])) found.add('AI-powered features');
+
+    // ── File / download tools
+    if (_anyOf(t, ['torrent', 'magnet link', '.torrent'])) found.add('torrent parsing');
+    if (_anyOf(t, ['direct download', 'direct link', 'http download'])) found.add('direct download links');
+    if (_anyOf(t, ['debrid', 'real-debrid', 'premiumize', 'alldebrid'])) found.add('debrid service integration');
+    if (_anyOf(t, ['youtube downloader', 'yt-dlp', 'video download', 'yt downloader'])) found.add('video downloader');
+    if (_anyOf(t, ['file converter', 'format converter', 'convert files', 'convert video', 'convert audio'])) found.add('file format conversion');
+    if (_anyOf(t, ['pdf convert', 'pdf to', 'to pdf'])) found.add('PDF conversion');
+    if (_anyOf(t, ['image compress', 'image resize', 'image convert', 'image optimizer'])) found.add('image processing');
+    if (_anyOf(t, ['url shortener', 'short url', 'link shortener'])) found.add('URL shortening');
+    if (_anyOf(t, ['qr code', 'qr generator', 'qr scanner'])) found.add('QR code generation & scanning');
+    if (_anyOf(t, ['barcode', 'barcode scanner'])) found.add('barcode scanning');
+    if (_anyOf(t, ['file manager', 'file browser', 'file explorer'])) found.add('file management');
+    if (_anyOf(t, ['cloud storage', 'file hosting', 'file upload'])) found.add('cloud file storage');
+    if (_anyOf(t, ['download manager', 'download queue', 'batch download'])) found.add('download queue manager');
+    if (_anyOf(t, ['vpn', 'proxy', 'tunnel'])) found.add('VPN / proxy support');
+    if (_anyOf(t, ['progress bar', 'download progress', 'transfer speed'])) found.add('download progress tracking');
+
+    // ── Productivity
+    if (_anyOf(t, ['todo', 'to-do', 'task list', 'task manager'])) found.add('task management');
+    if (_anyOf(t, ['note', 'notes', 'note-taking'])) found.add('note-taking');
+    if (_anyOf(t, ['calendar', 'events', 'scheduling'])) found.add('calendar & scheduling');
+    if (_anyOf(t, ['habit tracker', 'habit', 'streak'])) found.add('habit tracking');
+    if (_anyOf(t, ['expense', 'budget', 'spending tracker'])) found.add('expense tracking');
+    if (_anyOf(t, ['invoice', 'billing'])) found.add('invoice generation');
+    if (_anyOf(t, ['password manager', 'vault', 'secure credentials'])) found.add('password vault');
+    if (_anyOf(t, ['time tracker', 'pomodoro', 'work timer'])) found.add('time tracking');
+    if (_anyOf(t, ['offline mode', 'offline support', 'works offline'])) found.add('offline support');
+    if (_anyOf(t, ['sync', 'cloud sync', 'cross-device sync'])) found.add('cross-device sync');
+
+    // ── Dev tools
+    if (_anyOf(t, ['api tester', 'http client', 'request builder'])) found.add('API request testing');
+    if (_anyOf(t, ['code editor', 'syntax highlight', 'code highlight'])) found.add('code editor');
+    if (_anyOf(t, ['regex', 'regular expression tester'])) found.add('regex tester');
+    if (_anyOf(t, ['color picker', 'palette generator'])) found.add('color picker');
+    if (_anyOf(t, ['diagram', 'flowchart', 'uml'])) found.add('diagram builder');
+
+    // ── Media & entertainment
+    if (_anyOf(t, ['music player', 'audio player', 'playlist'])) found.add('music player');
+    if (_anyOf(t, ['podcast', 'podcast player'])) found.add('podcast player');
+    if (_anyOf(t, ['video player', 'media player', 'streaming player'])) found.add('video player');
+    if (_anyOf(t, ['subtitle', 'captions', 'srt'])) found.add('subtitle support');
 
     if (found.isNotEmpty) {
       ctx.result['features'] = found.toList();
@@ -1242,12 +1491,32 @@ class _StudioEngine {
         return 'Python script with training and evaluation';
       case _Mode.app:
         final type = ctx.result['type']?.toString() ?? '';
-        if (type == 'api') return 'full implementation';
-        if (type == 'mobile') return 'complete mobile app';
-        if (type == 'cli') return 'complete CLI implementation';
-        if (type == 'desktop') return 'complete desktop app';
+        final desc = ctx.result['description']?.toString() ?? '';
+        final platform = type == 'mobile' ? 'mobile app' :
+                         type == 'desktop' ? 'desktop app' :
+                         type == 'cli' ? 'CLI tool' :
+                         type == 'api' ? 'API service' :
+                         type == 'web' ? 'web app' : 'app';
+
         if (_anyOf(t, ['openapi', 'swagger'])) return 'OpenAPI spec + implementation';
-        return 'full implementation with file structure';
+
+        if (desc.isNotEmpty) {
+          return 'complete $platform — full source code, project structure, setup instructions, '
+              'and implementation for: $desc';
+        }
+
+        // Type-specific defaults with richer description
+        if (type == 'api') {
+          return 'full API implementation with endpoints, models, validation, and README';
+        }
+        if (type == 'mobile') {
+          final fw = ctx.result['framework']?.toString() ?? '';
+          return 'complete ${fw.isNotEmpty ? fw : "mobile"} app — screens, navigation, state management, and build setup';
+        }
+        if (type == 'cli') return 'complete CLI implementation with argument parsing and help docs';
+        if (type == 'desktop') return 'complete desktop app with UI, state management, and installer setup';
+        if (type == 'web') return 'complete web app — pages, components, routing, and deployment config';
+        return 'full implementation with file structure, source code, and setup instructions';
     }
   }
 
