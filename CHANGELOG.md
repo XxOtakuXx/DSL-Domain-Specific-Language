@@ -5,6 +5,34 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [v1.5.0] — 2026-04-05
+
+### ✨ New Features
+
+- **Studio AI** — built-in offline NLP engine, available as a first-class AI provider alongside Gemini, OpenAI, Anthropic, and Ollama. No API key, no server, no internet, no token limits.
+  - Multi-pass NLP pipeline: mode detection → intent extraction → domain-specific entity extraction → output inference
+  - 5 content domains: app development, content/writing, AI prompt engineering, DevOps/infrastructure, data/ML
+  - Extracts 20+ DSL keys from plain English input
+  - 100+ recognized technologies, frameworks, databases, auth methods, and platforms
+  - 60+ domain-specific description inferences (torrent tools, video downloaders, file converters, productivity apps, dev tools, e-learning, finance, social platforms, and more)
+  - Platform-aware auth defaults: JWT for mobile/generic, NextAuth for Next.js/Remix, session-based for Django/Rails/Laravel
+- **DSL Reference tab** — full-screen searchable reference for every DSL key. 7 categories, ~55 keys with purpose, explanation, examples, compact/expanded output previews, and notes. Category sidebar with colored accent borders and live cross-category search.
+
+### 🔧 Improvements
+
+- **PromptBuilder rewrite** — completely overhauled prompt generation for both compact and expanded output:
+  - New structured output order: TASK → TYPE → PURPOSE → tech stack (STACK/FRAMEWORK/LANGUAGE/DATABASE/AUTH/PROTOCOL/ARCHITECTURE/PLATFORM/TESTING) → FEATURES → REQUIREMENTS → STYLE → CONSTRAINTS → domain keys → OUTPUT
+  - New **REQUIREMENTS** block: auto-inferred implicit technical requirements from description and features (e.g., torrent parsing → "parse .torrent files, background download service, storage permissions"; payments → "Stripe SDK with webhook verification, PCI-compliant card handling")
+  - Expanded prompts now include purpose, tech stack sentence, architecture, inferred requirements, and constraints — previously all silently dropped
+  - Context-aware OUTPUT: includes framework, language, platform, and explicit deliverable list instead of generic "complete mobile app"
+- **Smarter CREATE extraction** — separates the app type from its functional description (e.g., "android app to torrent to direct download generator" → CREATE=android app, PURPOSE=converts torrent/magnet links to direct HTTP download links)
+- **Auth inference** — login/register/account/password words now always trigger auth detection with smart framework defaults
+- **50+ new feature keywords** — torrent, debrid, download manager, file converter, QR codes, URL shortener, password vault, time tracking, video player, podcast, subtitle support, and more
+- Command Palette "Open DSL Reference" replaced with "Go to Reference" (navigates to new tab, `Ctrl+Shift+R`)
+- README updated with Studio AI docs, Reference tab, and new output structure documentation
+
+---
+
 ## [v1.4.0] — 2026-04-05
 
 ### ✨ New Features
