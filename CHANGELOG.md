@@ -5,6 +5,20 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [v1.5.1] — 2026-04-05
+
+### 🐛 Bug Fixes
+
+- **Reference tab — Custom Keys:** "ANY KEY" meta entry was rendered as a regular key card, identical in appearance to real keys (NAME, GOAL, etc.), making it look like a duplicate. It is now rendered as a distinct info banner with an info icon and accent border — clearly separated from the actual keys below it.
+- **Reference tab — counts:** Sidebar count badge, header count badge, and total key count in the sidebar header now exclude the intro entry. Custom Keys correctly shows 8 (not 9).
+- **Reference tab — search:** The "ANY KEY" intro entry no longer appears in cross-category search results.
+
+### 🎨 Polish
+
+- **README visual refresh:** Centered hero section, `for-the-badge` style shields, quick-nav links, `Offline` column with ✅/❌ icons in the AI Providers table, Output Modes and History actions converted to tables, Quick Start rewritten as a clean code block.
+
+---
+
 ## [v1.5.0] — 2026-04-05
 
 ### ✨ New Features
