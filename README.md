@@ -1,17 +1,21 @@
+<div align="center">
+
 # DSL Prompt Studio
 
 **Write structured commands. Get optimized AI prompts instantly.**
 
-A native desktop app for Windows, macOS, and Linux that converts simple `KEY value` commands into token-efficient AI prompts, human-readable descriptions, and structured JSON — no internet required.
+A native desktop app for Windows, macOS, and Linux that converts simple `KEY value` commands into token-efficient AI prompts, human-readable descriptions, and structured JSON.
 
-Built with Flutter. No webview. No Electron. Real native performance.
+[![Release](https://img.shields.io/github/v/release/XxOtakuXx/DSL-Domain-Specific-Language?label=Latest%20Release&style=for-the-badge&color=4f8ef7)](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Flutter](https://img.shields.io/badge/Flutter-3.41.6-02569B?style=for-the-badge&logo=flutter)](https://flutter.dev)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=for-the-badge)]()
 
-[![Release](https://img.shields.io/github/v/release/XxOtakuXx/DSL-Domain-Specific-Language?label=Latest%20Release)](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language/releases/tag)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Flutter](https://img.shields.io/badge/Flutter-3.41.6-02569B?logo=flutter)](https://flutter.dev)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)]()
+**Built with Flutter · No webview · No Electron · Real native performance**
 
-> **Full version history** — see [CHANGELOG.md](CHANGELOG.md)
+[Download](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language/releases/latest) · [Quick Start](#quick-start) · [DSL Reference](#dsl-reference) · [Changelog](CHANGELOG.md)
+
+</div>
 
 ---
 
@@ -38,7 +42,7 @@ When you write AI prompts manually, they tend to look like this:
 
 > *"Please create a modern dark-themed web application that includes user authentication functionality, a dashboard interface, and a payment processing system. I would like you to provide the full implementation code."*
 
-That's **47 tokens**. The same intent as a DSL prompt:
+That's **47 tokens**. The same intent in DSL:
 
 ```
 CREATE app
@@ -48,50 +52,52 @@ STYLE modern dark
 OUTPUT full code
 ```
 
-Compact output: **~23 tokens** — **51% fewer tokens**, same information.
+Compact output: **~23 tokens** — **51% fewer tokens, same information.**
 
-At scale across hundreds of prompts, this saves real money on API costs and improves model focus.
+> At scale across hundreds of prompts, this saves real money on API costs and improves model focus.
 
 ---
 
 ## Quick Start
 
-1. **Download** from the [Releases page](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language/releases/latest)
-2. **Open** the app — no installer, no runtime needed
-3. **Type** your DSL in the left panel
-4. **Press** `Ctrl+Enter` (or `Cmd+Enter` on Mac)
-5. **Copy** the output from any of the three tabs: JSON, Compact Prompt, or Expanded Prompt
+```
+1. Download  →  releases page
+2. Open      →  no installer, no runtime needed
+3. Type      →  your DSL in the left panel
+4. Press     →  Ctrl+Enter  (or Cmd+Enter on Mac)
+5. Copy      →  from JSON, Compact Prompt, or Expanded Prompt tabs
+```
 
-That's it. No account, no sign-up, no internet connection required.
+No account. No sign-up. No internet required.
 
 ---
 
 ## How It Works
 
 ```
- You write this                The app generates these
-┌───────────────────┐         ┌──────────────────────────────────┐
-│                   │         │  JSON tab                        │
-│  CREATE app       │         │  { "create": "app",              │
-│  TYPE web         │────────>│    "type": "web", ... }          │
-│  FEATURES login,  │         ├──────────────────────────────────┤
-│    dashboard      │         │  Compact Prompt tab              │
-│  STYLE modern     │         │  TASK: build app                 │
-│  OUTPUT full code │         │  TYPE: web                       │
-│                   │         │  FEATURES:                       │
-│                   │         │  - auth                          │
-│                   │         │  - dashboard                     │
-│                   │         │  STYLE: modern                   │
-│                   │         │  OUTPUT: full code                │
-│                   │         ├──────────────────────────────────┤
-│                   │         │  Expanded Prompt tab             │
-│                   │         │  Build a modern web app.         │
-│                   │         │  Include auth and dashboard.     │
-│                   │         │  Provide full code.              │
-└───────────────────┘         └──────────────────────────────────┘
+ You write this                   The app generates these
+┌──────────────────────┐         ┌────────────────────────────────────┐
+│                      │         │  JSON tab                          │
+│  CREATE app          │         │  { "create": "app",                │
+│  TYPE web            │────────>│    "type": "web", ... }            │
+│  FEATURES login,     │         ├────────────────────────────────────┤
+│    dashboard         │         │  Compact Prompt tab                │
+│  STYLE modern        │         │  TASK: build app                   │
+│  OUTPUT full code    │         │  TYPE: web                         │
+│                      │         │  FEATURES:                         │
+│                      │         │  - auth                            │
+│                      │         │  - dashboard                       │
+│                      │         │  STYLE: modern                     │
+│                      │         │  OUTPUT: full code                 │
+│                      │         ├────────────────────────────────────┤
+│                      │         │  Expanded Prompt tab               │
+│                      │         │  Build a modern web app.           │
+│                      │         │  Include auth and dashboard.       │
+│                      │         │  Provide full code.                │
+└──────────────────────┘         └────────────────────────────────────┘
 ```
 
-Each line in the editor follows a simple format: `KEY value`. That's the entire syntax.
+Each line in the editor follows one simple format: `KEY value`. That's the entire syntax.
 
 ---
 
@@ -113,7 +119,7 @@ Each line in the editor follows a simple format: `KEY value`. That's the entire 
 ### Productivity
 
 | Feature | Shortcut | Description |
-|---------|----------|-------------|
+|---------|:--------:|-------------|
 | **Generate** | `Ctrl+Enter` | Instantly convert DSL to all three output formats |
 | **Command Palette** | `Ctrl+P` | Keyboard launcher for all actions — generate, switch modes, navigate tabs |
 | **Go to Reference** | `Ctrl+Shift+R` | Jump to the Reference tab — full DSL key browser with search |
@@ -128,15 +134,15 @@ Each line in the editor follows a simple format: `KEY value`. That's the entire 
 
 Configure an AI provider in Settings to power Plain Talk mode with smarter parsing:
 
-| Provider | Model | Cost | Requires Internet |
-|----------|-------|------|:-----------------:|
-| **Studio AI** | Built-in NLP engine | Free | No |
-| **Gemini** | Gemini 2.0 Flash | Free tier available | Yes |
-| **OpenAI** | GPT-4o-mini | Paid | Yes |
-| **Anthropic** | Claude Haiku | Paid | Yes |
-| **Ollama** | Any local model | Free | No |
+| Provider | Model | Cost | Offline |
+|----------|-------|:----:|:-------:|
+| **Studio AI** | Built-in NLP engine | Free | ✅ Yes |
+| **Gemini** | Gemini 2.0 Flash | Free tier | ❌ No |
+| **OpenAI** | GPT-4o-mini | Paid | ❌ No |
+| **Anthropic** | Claude Haiku | Paid | ❌ No |
+| **Ollama** | Any local model | Free | ✅ Yes |
 
-**Studio AI** is the built-in option — no API key, no server, no internet, no token limits. It uses a multi-pass NLP pipeline that extracts 20+ DSL keys from plain English, infers technical requirements, and auto-detects 5 content domains (app, content, AI prompt, DevOps, data/ML).
+**Studio AI** is the built-in option — no API key, no server, no internet, no token limits. It runs a multi-pass NLP pipeline that extracts 20+ DSL keys from plain English, auto-infers technical requirements, and detects 5 content domains (app, content, AI prompt, DevOps, data/ML).
 
 DSL mode never makes network calls — it always works offline regardless of provider settings.
 
@@ -168,17 +174,17 @@ DSL mode never makes network calls — it always works offline regardless of pro
 
 ### Option 1 — Download a Release (Recommended)
 
-Go to the [Releases page](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language/releases/latest) and download the file for your platform:
+Go to the [Releases page](https://github.com/XxOtakuXx/DSL-Domain-Specific-Language/releases/latest) and grab the file for your platform:
 
 | Platform | File | How to run |
 |----------|------|------------|
-| **Windows** | `DSL-Prompt-Studio-Windows.zip` | Extract, double-click `dsl_domain_specific_language.exe` |
-| **macOS** | `DSL-Prompt-Studio-macOS.zip` | Unzip, drag `.app` to Applications, open |
-| **Linux** | `DSL-Prompt-Studio-Linux.tar.gz` | `tar -xzf ...`, then `./dsl_domain_specific_language` |
+| **Windows** | `DSL-Prompt-Studio-Windows.zip` | Extract → double-click `dsl_domain_specific_language.exe` |
+| **macOS** | `DSL-Prompt-Studio-macOS.zip` | Unzip → drag `.app` to Applications → open |
+| **Linux** | `DSL-Prompt-Studio-Linux.tar.gz` | `tar -xzf ...` → `./dsl_domain_specific_language` |
 
-Self-contained builds — no Flutter, no runtime, no installer.
+Self-contained builds — no Flutter, no runtime, no installer required.
 
-> **macOS:** On first launch, right-click the app and choose **Open** to bypass the Gatekeeper warning (the app is not notarized).
+> **macOS note:** On first launch, right-click → **Open** to bypass the Gatekeeper warning. The app is not notarized.
 
 ### Option 2 — Build from Source
 
@@ -191,7 +197,7 @@ flutter pub get
 flutter run -d windows    # or macos / linux
 ```
 
-**Release build:**
+**Release builds:**
 
 ```bash
 flutter build windows     # → build\windows\x64\runner\Release\
@@ -200,7 +206,7 @@ flutter build linux       # → build/linux/x64/release/bundle/
 ```
 
 <details>
-<summary>Platform-specific build requirements</summary>
+<summary>Platform-specific requirements</summary>
 
 | Platform | Requirements |
 |----------|-------------|
@@ -225,13 +231,13 @@ KEY value
 - One instruction per line
 - First word = key (case-insensitive), rest = value
 - Commas for multiple values: `FEATURES login, dashboard, payments`
-- Lines starting with `#` are comments (ignored)
+- Lines starting with `#` are comments — ignored
 - Blank lines are ignored
 - **Any key works** — the parser handles everything generically
 
 ### The 5 Special Keys
 
-These keys have fixed positions in the output. All other keys appear between TYPE and FEATURES:
+These keys have fixed positions in the output. All other keys appear between `TYPE` and `FEATURES`:
 
 | Key | What it does | Example |
 |-----|-------------|---------|
@@ -243,14 +249,16 @@ These keys have fixed positions in the output. All other keys appear between TYP
 
 ### Output Modes
 
-- **Compact** — token-efficient, keyword-driven. Best for AI APIs where you pay per token.
-- **Expanded** — natural language sentences. Best for pasting into ChatGPT, Claude, or sharing with others.
+| Mode | Best for |
+|------|----------|
+| **Compact** | AI APIs where you pay per token — keyword-driven, minimal |
+| **Expanded** | Pasting into ChatGPT, Claude, Gemini, or sharing with others — full sentences |
 
 ### Using Templates
 
 1. Click the **Templates** tab
-2. Browse by category (sidebar) or type in the search bar
-3. Hover a template card and click **Use Template** to load it into the editor
+2. Browse by category (sidebar) or search as you type
+3. Hover a template card → click **Use Template** to load it into the editor
 
 ### Saving Custom Templates
 
@@ -263,20 +271,22 @@ These keys have fixed positions in the output. All other keys appear between TYP
 
 Click the **History** tab to see past generations (up to 100 entries):
 
-- **Restore** — reload the original input back into the editor
-- **Delete** — remove individual entries
-- **Clear All** — wipe all history
-- **Search** — filter by content
+| Action | What it does |
+|--------|-------------|
+| **Restore** | Reload the original input back into the editor |
+| **Delete** | Remove individual entries |
+| **Clear All** | Wipe all history |
+| **Search** | Filter by content |
 
 ### Plain Talk Mode
 
-Switch to **Plain Talk** in the toolbar, then type naturally:
+Switch to **Plain Talk** in the toolbar, then describe what you want naturally:
 
 > *"Build a React e-commerce site with login, product catalog, cart, and Stripe payments"*
 
 Press **Generate** — the app converts it to structured output just like DSL mode.
 
-Select **Studio AI** in Settings for instant, offline parsing with no API key — or configure an external provider for cloud-powered parsing.
+Select **Studio AI** in Settings for instant offline parsing with no API key — or configure an external provider for cloud-powered parsing.
 
 ### Command Palette
 
@@ -293,12 +303,12 @@ Press `Ctrl+P` to launch the Command Palette:
 | Toggle Compact/Expanded | Switch output mode |
 | Go to Reference | Open the DSL Reference tab |
 
-Navigate with arrow keys, confirm with `Enter`, dismiss with `Esc`.
+Navigate with arrow keys · confirm with `Enter` · dismiss with `Esc`.
 
 ### Configuring an AI Provider
 
 1. Click the **Settings** tab
-2. Select a provider (Gemini, OpenAI, Anthropic, or Ollama)
+2. Select a provider
 3. Paste your API key and click **Save**
 
 | Provider | Where to get a key |
@@ -317,15 +327,26 @@ Your key is stored locally and never leaves your machine.
 
 ### Output Structure
 
-**Compact:** `TASK` → `TYPE` → `PURPOSE` → tech stack (`STACK`/`FRAMEWORK`/`LANGUAGE`/`DATABASE`/`AUTH`/`PROTOCOL`/`ARCHITECTURE`/`PLATFORM`/`TESTING`) → `FEATURES` list → `REQUIREMENTS` (auto-inferred) → `STYLE` → `CONSTRAINTS` → domain keys → `OUTPUT`
+**Compact output order:**
 
-**Expanded:** Opening sentence (`STYLE` + `TYPE` + `CREATE`) → purpose → tech stack → architecture → features → inferred requirements → domain keys → constraints → `OUTPUT`
+```
+TASK → TYPE → PURPOSE → tech stack (STACK / FRAMEWORK / LANGUAGE / DATABASE / AUTH / PROTOCOL / ARCHITECTURE / PLATFORM / TESTING)
+     → FEATURES list → REQUIREMENTS (auto-inferred) → STYLE → CONSTRAINTS → domain keys → OUTPUT
+```
 
-The `REQUIREMENTS` block is auto-generated — it infers implicit technical needs from your description and features (e.g., torrent parsing → "parse .torrent files, background download service, storage permissions").
+**Expanded output order:**
+
+```
+Opening sentence (STYLE + TYPE + CREATE) → purpose → tech stack sentence → architecture
+     → features → inferred requirements → domain keys → constraints → OUTPUT
+```
+
+> **REQUIREMENTS** is auto-generated — it infers implicit technical needs from your description and features.
+> Example: torrent parsing → *"parse .torrent files, background download service, storage permissions"*
 
 ### Extra Keys by Category
 
-You can use **any key** — these are common ones organized for reference.
+You can use **any key** — these are the common ones organized for reference.
 
 <details>
 <summary><strong>Software Development</strong></summary>
@@ -705,6 +726,7 @@ It works. Unknown keys are included in the output as-is. The parser handles any 
 <summary><strong>Where is my data stored?</strong></summary>
 
 History and custom templates are stored in a local SQLite database (`dsl_studio.db`) in your system's app support directory:
+
 - **Windows:** `%APPDATA%\dsl_domain_specific_language`
 - **macOS:** `~/Library/Application Support/dsl_domain_specific_language`
 
@@ -722,7 +744,7 @@ Select **Studio AI** in Settings — it's the built-in NLP engine that handles 5
 <details>
 <summary><strong>How accurate is the token count?</strong></summary>
 
-It's an approximation (word count x 1.0). Real token counts vary by model and tokenizer (typically 0.75-1.3 tokens per word). Use it for ballpark comparison, not billing.
+It's an approximation (word count × 1.0). Real token counts vary by model and tokenizer (typically 0.75–1.3 tokens per word). Use it for ballpark comparison, not billing.
 
 </details>
 
