@@ -106,7 +106,9 @@ Each line in the editor follows a simple format: `KEY value`. That's the entire 
 | **Custom templates** | Save your own DSL prompts with title, description, category, and tags |
 | **Generation history** | Every prompt you generate is saved locally — browse, search, restore, or delete |
 | **Plain Talk mode** | Describe what you want in plain English — the app converts it to structured output |
-| **Fully offline** | DSL mode and templates work with zero internet. Only Plain Talk with an AI provider needs a connection |
+| **Studio AI** | Built-in offline NLP engine — no API key, no server, no token limits. Extracts 20+ DSL keys from natural language |
+| **DSL Reference tab** | Full-screen searchable reference with every DSL key, explanations, examples, and output previews |
+| **Fully offline** | DSL mode, templates, and Studio AI work with zero internet. Only external AI providers need a connection |
 
 ### Productivity
 
@@ -114,7 +116,7 @@ Each line in the editor follows a simple format: `KEY value`. That's the entire 
 |---------|----------|-------------|
 | **Generate** | `Ctrl+Enter` | Instantly convert DSL to all three output formats |
 | **Command Palette** | `Ctrl+P` | Keyboard launcher for all actions — generate, switch modes, navigate tabs |
-| **DSL Key Reference** | `Ctrl+Shift+R` | Searchable cheat sheet of all supported keys with one-click copy |
+| **Go to Reference** | `Ctrl+Shift+R` | Jump to the Reference tab — full DSL key browser with search |
 | **Token counter** | — | Live approximate token count in the output tab bar |
 | **Font size controls** | — | Adjust output panel font size (10–20pt) |
 | **Word wrap toggle** | — | Switch between soft-wrapped and scrollable output |
@@ -122,16 +124,19 @@ Each line in the editor follows a simple format: `KEY value`. That's the entire 
 
 > On macOS, replace `Ctrl` with `Cmd`.
 
-### AI Providers (Optional)
+### AI Providers
 
 Configure an AI provider in Settings to power Plain Talk mode with smarter parsing:
 
-| Provider | Model | Cost |
-|----------|-------|------|
-| **Gemini** | Gemini 2.0 Flash | Free tier available |
-| **OpenAI** | GPT-4o-mini | Paid |
-| **Anthropic** | Claude Haiku | Paid |
-| **Ollama** | Any local model | Free (runs locally) |
+| Provider | Model | Cost | Requires Internet |
+|----------|-------|------|:-----------------:|
+| **Studio AI** | Built-in NLP engine | Free | No |
+| **Gemini** | Gemini 2.0 Flash | Free tier available | Yes |
+| **OpenAI** | GPT-4o-mini | Paid | Yes |
+| **Anthropic** | Claude Haiku | Paid | Yes |
+| **Ollama** | Any local model | Free | No |
+
+**Studio AI** is the built-in option — no API key, no server, no internet, no token limits. It uses a multi-pass NLP pipeline that extracts 20+ DSL keys from plain English, infers technical requirements, and auto-detects 5 content domains (app, content, AI prompt, DevOps, data/ML).
 
 DSL mode never makes network calls — it always works offline regardless of provider settings.
 
@@ -271,7 +276,7 @@ Switch to **Plain Talk** in the toolbar, then type naturally:
 
 Press **Generate** — the app converts it to structured output just like DSL mode.
 
-With an AI provider configured, parsing is more accurate. Without one, the built-in offline parser handles common patterns.
+Select **Studio AI** in Settings for instant, offline parsing with no API key — or configure an external provider for cloud-powered parsing.
 
 ### Command Palette
 
@@ -286,7 +291,7 @@ Press `Ctrl+P` to launch the Command Palette:
 | Load / Save / Export | File operations |
 | Save Template | Save current DSL as a template |
 | Toggle Compact/Expanded | Switch output mode |
-| DSL Key Reference | Open the cheat sheet |
+| Go to Reference | Open the DSL Reference tab |
 
 Navigate with arrow keys, confirm with `Enter`, dismiss with `Esc`.
 
@@ -298,6 +303,7 @@ Navigate with arrow keys, confirm with `Enter`, dismiss with `Esc`.
 
 | Provider | Where to get a key |
 |----------|--------------------|
+| Studio AI | No key needed — built-in |
 | Gemini | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
 | OpenAI | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
 | Anthropic | [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) |
@@ -311,9 +317,11 @@ Your key is stored locally and never leaves your machine.
 
 ### Output Structure
 
-**Compact:** `TASK` → `TYPE` → extra keys (input order) → `FEATURES` list → `STYLE` → `OUTPUT`
+**Compact:** `TASK` → `TYPE` → `PURPOSE` → tech stack (`STACK`/`FRAMEWORK`/`LANGUAGE`/`DATABASE`/`AUTH`/`PROTOCOL`/`ARCHITECTURE`/`PLATFORM`/`TESTING`) → `FEATURES` list → `REQUIREMENTS` (auto-inferred) → `STYLE` → `CONSTRAINTS` → domain keys → `OUTPUT`
 
-**Expanded:** Opening sentence (`STYLE` + `TYPE` + `CREATE`) → features sentence → extra key sentences → `OUTPUT` sentence
+**Expanded:** Opening sentence (`STYLE` + `TYPE` + `CREATE`) → purpose → tech stack → architecture → features → inferred requirements → domain keys → constraints → `OUTPUT`
+
+The `REQUIREMENTS` block is auto-generated — it infers implicit technical needs from your description and features (e.g., torrent parsing → "parse .torrent files, background download service, storage permissions").
 
 ### Extra Keys by Category
 
@@ -576,6 +584,7 @@ lib/
 │   ├── token_counter.dart            Approximate token count
 │   └── ai_providers/
 │       ├── ai_provider.dart          Abstract interface + shared prompt
+│       ├── studio_ai_provider.dart   Built-in NLP engine (no API, offline)
 │       ├── gemini_provider.dart      Gemini 2.0 Flash
 │       ├── openai_provider.dart      GPT-4o-mini
 │       ├── anthropic_provider.dart   Claude Haiku
@@ -584,6 +593,7 @@ lib/
 │   ├── home_screen.dart              Editor with resizable split pane
 │   ├── templates_screen.dart         Template library browser
 │   ├── history_screen.dart           Generation history browser
+│   ├── reference_screen.dart         DSL key reference browser
 │   └── settings_screen.dart          AI provider configuration
 └── widgets/
     ├── editor.dart                   Syntax-highlighted DSL editor
@@ -617,7 +627,7 @@ The app uses [Riverpod](https://riverpod.dev/) with `StateProvider`s:
 
 | Provider | Type | Purpose |
 |----------|------|---------|
-| `navPageProvider` | `NavPage` | Active tab (editor / templates / history / settings) |
+| `navPageProvider` | `NavPage` | Active tab (editor / templates / history / reference / settings) |
 | `dslInputProvider` | `String` | Raw DSL text in editor |
 | `plainInputProvider` | `String` | Raw text in Plain Talk mode |
 | `inputModeProvider` | `InputMode` | DSL vs Plain Talk |
@@ -666,7 +676,7 @@ Tests cover: key-value extraction, comma splitting, key normalization, comment/b
 <details>
 <summary><strong>Does this send my data anywhere?</strong></summary>
 
-In DSL mode: **no**. Everything is fully offline. If you configure an AI provider, Plain Talk input is sent to that provider's API when you press Generate. Your API key is stored locally and never leaves your machine.
+In DSL mode and with Studio AI: **no**. Everything is fully offline. If you configure an external AI provider (Gemini, OpenAI, Anthropic), Plain Talk input is sent to that provider's API when you press Generate. Ollama also stays local. Your API key is stored locally and never leaves your machine.
 
 </details>
 
@@ -705,7 +715,7 @@ History is capped at 100 entries (oldest auto-removed).
 <details>
 <summary><strong>Plain Talk gave an unexpected result</strong></summary>
 
-Without an AI provider, the offline parser uses keyword matching — it works best for common patterns. For nuanced descriptions, configure a provider in Settings. Gemini has a free tier and works well.
+Select **Studio AI** in Settings — it's the built-in NLP engine that handles 5 content domains, 20+ DSL keys, and 100+ technologies with no API key needed. For even more nuanced parsing, configure an external provider (Gemini has a free tier).
 
 </details>
 
