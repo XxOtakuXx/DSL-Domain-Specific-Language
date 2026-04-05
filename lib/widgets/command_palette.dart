@@ -112,6 +112,16 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
         },
       ),
       _Command(
+        label: 'Go to Reference',
+        description: 'Browse all DSL keys with explanations and examples',
+        icon: Icons.menu_book_outlined,
+        shortcut: 'Ctrl+Shift+R',
+        action: (ref, ctx) {
+          Navigator.pop(ctx);
+          ref.read(navPageProvider.notifier).state = NavPage.reference;
+        },
+      ),
+      _Command(
         label: 'Go to Settings',
         description: 'Configure AI provider and API keys',
         icon: Icons.settings_outlined,

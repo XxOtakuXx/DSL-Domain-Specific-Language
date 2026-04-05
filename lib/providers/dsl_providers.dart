@@ -4,7 +4,7 @@ import '../services/custom_template_service.dart';
 
 // ── Navigation ───────────────────────────────────────────────────────────────
 
-enum NavPage { editor, templates, history, settings }
+enum NavPage { editor, templates, history, reference, settings }
 
 final navPageProvider = StateProvider<NavPage>((ref) => NavPage.editor);
 

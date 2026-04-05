@@ -4,6 +4,7 @@ import 'package:window_manager/window_manager.dart';
 import 'providers/dsl_providers.dart';
 import 'screens/history_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/reference_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/templates_screen.dart';
 import 'theme/app_colors.dart';
@@ -114,6 +115,7 @@ class _AppShell extends ConsumerWidget {
                 HomeScreen(),
                 TemplatesScreen(),
                 HistoryScreen(),
+                ReferenceScreen(),
                 SettingsScreen(),
               ],
             ),
